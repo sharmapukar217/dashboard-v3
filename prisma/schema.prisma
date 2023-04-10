@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  sid           String    @id
+  currentUserId String?
+  lastLoggedIn  DateTime?
+  userAgent     String?
+  // ipAddress     String
+  savedAccounts String @default("")
+
+  currentUser User? @relation(fields: [currentUserId], references: [id])
+
+  @@map("sessions")
+}
+
+// TODO: think for the notification subscription model
+model NoficicationSubscription {
+  deviceId     String @id
+  subscription String
+  userId       String
+  user         User   @relation(fields: [userId], references: [id])
+
+  @@map("notification_subscriptions")
+}
+
+model User {
+  id       String @id @default(cuid()) @map("_id")
+  name     String
+  picture  String
+  username String @unique
+  email    String @unique
+  role     String @default("normaluser")
+  password String
+  vendorId String
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+
+  vendor                    Vendor                     @relation(fields: [vendorId], references: [id], onDelete: NoAction)
+  Session                   Session[]
+  noficicationSubscriptions NoficicationSubscription[]
+
+  PackagesUpdatedByUser Package[] @relation(name: "StatusUpdatedBy")
+  PackagesForPickup     Package[] @relation(name: "PickupPerson")
+  PackagesForDelivery   Package[] @relation(name: "DeliveryPerson")
+  PackagesForReturn     Package[] @relation(name: "ReturnPerson")
+
+  @@map("users")
+}
+
+model Vendor {
+  id            String  @id @default(cuid()) @map("_id")
+  vendorName    String
+  vendorEmail   String
+  vendorAddress String
+  mainVendorId  String?
+  User          User[]
+
+  mainVendor Vendor?   @relation(name: "Vendor_Vendor", fields: [mainVendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subVendors Vendor[]  @relation(name: "Vendor_Vendor")
+  packages   Package[]
+
+  @@map("vendors")
+}
+
+model Package {
+  id              String @id @default(cuid()) @map("_id")
+  customerName    String
+  customerNumber  String
+  customerAddress String
+  vendorId        String
+  vendor          Vendor @relation(fields: [vendorId], references: [id])
+  status          String @default("ORDER_CREATED")
+
+  statusUpdatedBy String
+  statusUpdatedAt DateTime @default(now())
+
+  pickupPerson   String?
+  deliveryPerson String?
+  returnPerson   String?
+
+  customerPaymentMethod     String    @default("NOT_PAID")
+  customerPaymentVerifiedBy String?
+  customerPaymentVerifiedAt DateTime?
+  vendorPaymentMethod       String    @default("NOT_PAID")
+  vendorPaymentVerifiedBy   String?
+  vendorPaymentVerifiedAt   DateTime?
+
+  cod            Float
+  deliveryCharge Float @default(100)
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+
+  StatusUpdatedBy User  @relation(name: "StatusUpdatedBy", fields: [statusUpdatedBy], references: [id])
+  PickupPerson    User? @relation(name: "PickupPerson", fields: [pickupPerson], references: [id])
+  DeliveryPerson  User? @relation(name: "DeliveryPerson", fields: [pickupPerson], references: [id])
+  ReturnPerson    User? @relation(name: "ReturnPerson", fields: [pickupPerson], references: [id])
+
+  @@map("packages")
+}
