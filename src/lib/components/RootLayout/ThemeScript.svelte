@@ -3,7 +3,7 @@
   import { appTheme, type AppTheme } from "$lib/stores/appTheme";
 
   export const theme: Partial<AppTheme> | undefined = {};
-  if(theme) appTheme.update((t) => ({ ...t, ...theme }));
+  if (theme) appTheme.update((t) => ({ ...t, ...theme }));
 
   let mode = $appTheme.mode;
   const media = "(prefers-color-scheme: dark)";
@@ -20,7 +20,7 @@
   onMount(() => {
     const darkScheme = window.matchMedia(media);
 
-    const unsubscribe = appTheme.subscribe($theme => {
+    const unsubscribe = appTheme.subscribe(($theme) => {
       if ($theme.mode === "system") {
         handleChange(darkScheme);
         darkScheme.addEventListener("change", handleChange);
@@ -30,7 +30,7 @@
       }
     });
 
-    return unsubscribe
+    return unsubscribe;
   });
 </script>
 

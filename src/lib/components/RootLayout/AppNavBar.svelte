@@ -6,7 +6,8 @@
   import AppSubNav from "./AppSubNav.svelte";
   import { authStore } from "$lib/stores/authStore";
   import { NavLink } from "$lib/components/Navigation";
-  import { appTheme } from "$lib/stores/appTheme"
+  import { appTheme } from "$lib/stores/appTheme";
+  import { ensureRole } from "$lib/utilities/functions";
 
   // prettier-ignore
   let navOpened = false, subNavOpened = false;
@@ -29,6 +30,7 @@
 
   afterNavigate(() => {
     navOpened = false;
+    subNavOpened = false;
   });
 </script>
 
@@ -45,7 +47,7 @@
   <div class="ml-auto inline-flex items-center space-x-2 md:order-2">
     <a
       href="/notifications"
-      class="w-6.5 h-6.5 rounded-full focus:(ring-2 ring-black) [.nav-dark_&]:(text-gray-400 hover:text-white focus:ring-white) dark:focus:ring-white">
+      class="inline-flex items-center justify-center w-6.5 h-6.5 rounded-full focus:(ring-2 ring-black) [.nav-dark_&]:(text-gray-400 hover:text-white focus:ring-white) dark:focus:ring-white">
       <i class="i-heroicons-bell rotate-15 h-6 w-6" />
     </a>
 
@@ -77,14 +79,16 @@
     class:hidden={!navOpened}
     class="nav-links mt-1 basis-full flex-col space-y-1 md:order-1 md:mt-0 md:flex md:flex-row md:space-x-1 md:space-y-0">
     {#each navlinks as link (link.href)}
-      <NavLink
-        href={link.href}
-        exact={link.href === "/"}
-        activeclass="!bg-gray-200 !text-black ![.nav-dark_&]:(bg-gray-900 text-white) !dark:(bg-dark-700 text-white) !dark:[.nav-dark_&]:(bg-dark-700 text-white)"
-        class="block rounded-md px-3 py-1.5 text-base font-medium text-gray-800 hover:(bg-gray-100 text-black) [.nav-dark_&]:(text-gray-200 hover:text-white hover:bg-gray-700) dark:(text-gray-300 hover:text-white hover:bg-dark-900)">
-        <i class="{link.icon} mr-3 h-5 w-5 md:hidden" />
-        <span>{link.title}</span>
-      </NavLink>
+      {#if !$authStore.currentUser || !link.roles || ensureRole($authStore.currentUser?.role, link.roles)}
+        <NavLink
+          href={link.href}
+          exact={link.href === "/"}
+          activeclass="!bg-gray-200 !text-black ![.nav-dark_&]:(bg-gray-900 text-white) !dark:(bg-dark-700 text-white) !dark:[.nav-dark_&]:(bg-dark-700 text-white)"
+          class="block rounded-md px-3 py-1.5 text-base font-medium text-gray-800 hover:(bg-gray-100 text-black) [.nav-dark_&]:(text-gray-200 hover:text-white hover:bg-gray-700) dark:(text-gray-300 hover:text-white hover:bg-dark-900)">
+          <i class="{link.icon} mr-3 h-5 w-5 md:hidden" />
+          <span>{link.title}</span>
+        </NavLink>
+      {/if}
     {/each}
 
     {#if $authStore.currentUser}

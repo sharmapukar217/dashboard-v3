@@ -14,7 +14,11 @@ declare global {
     }
     interface PageData {
       currentUser: ReturnType<Awaited<import("$lib/functions/auth.server").getCurrentUser>>;
-      flash?: { type: "success" | "error" | "warning" | "loading"; id?: string; message: string };
+      flash?: {
+        type: "info" | "success" | "error" | "warning" | "loading";
+        id?: string;
+        message: string;
+      };
     }
   }
 

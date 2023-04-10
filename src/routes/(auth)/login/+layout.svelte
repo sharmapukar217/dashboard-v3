@@ -2,8 +2,8 @@
   import { NavLink } from "$lib/components/Navigation";
 </script>
 
-<div class="h-full w-full overflow-auto">
-  <div class="w-full md:max-w-md flex flex-col mx-auto px-6 py-6 select-none">
+<div class="h-full w-full">
+  <div class="w-full md:max-w-md flex flex-col mx-auto px-6 md:py-6 select-none">
     <div class="mx-auto text-center mt-5">
       <h1 class="text-2xl">LogikinNepal</h1>
       <h2>Welcome to login</h2>
@@ -22,10 +22,11 @@
         activeclass="bg-white dark:bg-gray-700 text-primary-500 dark:text-primary-400 font-medium border border-white dark:border-0"
         class="w-full rounded-lg py-1.5 text-center text-md">Saved Account</NavLink>
     </div>
+
     <slot />
 
-    <div class="py-5">
-      <div class="flex items-center mb-2">
+    <div class="py-2">
+      <div class="flex items-center my-2">
         <div class="flex-grow h-px bg-gray-200 dark:bg-gray-700" />
         <span class="flex-shrink text-sm px-2 text-gray-500 dark:text-gray-200">or</span>
         <div class="flex-grow h-px bg-gray-200 dark:bg-gray-700" />

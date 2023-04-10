@@ -5,6 +5,7 @@
   import { updateFlash } from "sveltekit-flash-message/client";
   import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 
+  import { authStore } from "$lib/stores/authStore"
   import { previousUrl } from "$lib/stores/previousUrl";
   import { onLoadSavedAccounts } from "$lib/functions/auth.telefunc";
 
@@ -54,7 +55,8 @@
         if (result.data?.currentUser) {
           queryClient.setQueryData(["current-user"], result.data.currentUser);
           await queryClient.invalidateQueries();
-          await goto($previousUrl);
+
+          await goto($previousUrl.startsWith("/login") ? "/" : $previousUrl);
         } else if (result.data?.removed) {
           queryClient.setQueryData(["saved-accounts"], (data: any) => {
             return data.filter((d: any) => d.username !== username);
@@ -67,45 +69,57 @@
   };
 </script>
 
-<form
-  method="POST"
-  on:submit={handleSubmit}
-  class="rounded-lg border-2 border-white dark:border-gray-700 bg-gray-100 dark:bg-gray-800 shadow p-0.5 space-y-0.5">
-  {#if $query.data?.length}
-    {#each $query.data as account}
-      <div class="bg-white dark:bg-gray-800 rounded-lg py-1.5 px-2 text-base inline-flex w-full border-b dark:border-gray-700 dark:rounded-b-0">
-        <div class="border-r dark:border-gray-600 pr-2">
-          <img src={account.picture} alt="" class="rounded-full w-10 h-10" />
-        </div>
-        <div class="ml-2 text-left">
-          <div class="block">{account.name}</div>
-          <div class="block text-xs text-primary-500 hover:underline">@{account.username}</div>
-        </div>
+<div class="h-full p-0.5 flex flex-col">
+  <form
+    method="POST"
+    on:submit={handleSubmit}
+    class="rounded-lg border-2 border-white dark:border-gray-700 bg-gray-100 dark:bg-gray-800 shadow p-0.5 space-y-0.5 h-full overflow-auto">
+    {#if $query.data?.length}
+      {#each $query.data as account (account.id)}
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg py-1.5 px-2 text-base inline-flex w-full border-b dark:border-gray-700 dark:rounded-b-0">
+          <div class="border-r dark:border-gray-600 pr-2">
+            <img src={account.picture} alt="" class="rounded-full w-10 h-10" />
+          </div>
+          <div class="ml-2 text-left">
+            <div class="block">{account.name}</div>
+            <div class="inline-flex items-center block text-xs">
+              <span class="text-primary-500 hover:underline cursor-pointer">@{account.username}</span>
+              {#if account.id === $authStore.currentUser?.id}
+              <div class="ml-1 text-gray-500">(current)</div>
+              {/if}
+            </div>
+          </div>
 
-        <div class="ml-auto inline-flex space-x-1">
-          <button
-            type="submit"
-            formaction="?/login&username={account.username}&userId={account.id}"
-            title="login as @{account.username}"
-            class="my-auto text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-green-400 p-1 inline-flex justify-center">
-            <i class="i-heroicons-chevron-right w-6 h-6" />
-          </button>
+          <div class="ml-auto inline-flex space-x-1">
+            {#if account.id !== $authStore.currentUser?.id}
+            <button
+              type="submit"
+              formaction="?/login&username={account.username}&userId={account.id}"
+              title="login as @{account.username}"
+              class="my-auto text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-green-400 p-1 inline-flex justify-center">
+              <i class="i-heroicons-chevron-right w-6 h-6" />
+            </button>
+            {/if}
 
-          <button
-            type="submit"
-            formaction="?/remove&username={account.username}&userId={account.id}"
-            title="remove @{account.username} from saved accounts."
-            class="my-auto text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-red-400 p-1 inline-flex justify-center">
-            <i class="i-heroicons-x-mark w-6 h-6" />
-          </button>
+            <button
+              type="submit"
+              formaction="?/remove&username={account.username}&userId={account.id}"
+              title="remove @{account.username} from saved accounts."
+              class="my-auto text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-red-400 p-1 inline-flex justify-center">
+              <i class="i-heroicons-x-mark w-6 h-6" />
+            </button>
+          </div>
         </div>
-      </div>
-    {/each}
-  {:else}
-    <div class="bg-white rounded-lg py-1.5 px-2 text-base text-center">No saved accounts.</div>
-  {/if}
+      {/each}
+    {:else}
+      <div class="bg-white rounded-lg py-1.5 px-2 text-base text-center">No saved accounts.</div>
+    {/if}
+  </form>
   <a
     href="/login"
-    class="block bg-white dark:bg-gray-700 dark:text-white text-primary-600 rounded-lg !mt-1 py-1.5 px-2 text-base text-center"
-    >Add account</a>
-</form>
+    class="bg-gray-100 border-2 border-white dark:border-gray-800 shadow dark:bg-gray-700 dark:text-white text-primary-600 rounded-lg !mt-1 p-2 text-base text-center inline-flex items-center justify-center space-x-2">
+    <i class="i-bi-person-plus w-5 h-5" />
+    <span>Add account</span>
+  </a>
+</div>

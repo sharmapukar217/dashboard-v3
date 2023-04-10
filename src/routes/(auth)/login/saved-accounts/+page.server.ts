@@ -38,7 +38,7 @@ export const actions = {
               currentUserId: user.id
             }
           });
-          setFlash({ type: "success", id: "auth", message: `Welcome ${user.name}.` }, event);
+          setFlash({ type: "info", id: "auth", message: `Welcome ${user.name}.` }, event);
 
           if (shouldRedirect) {
             throw redirect(301, "/");

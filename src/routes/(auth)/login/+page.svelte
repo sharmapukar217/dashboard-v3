@@ -37,7 +37,7 @@
   };
 </script>
 
-<form method="post" action="?/credentials" autocomplete="off" use:enhance>
+<form method="post" action="?/credentials" class="h-full" autocomplete="off" use:enhance>
   <div class="mt-2">
     <label for="login" class="text-gray-800 dark:text-gray-200">Username or email address</label>
     <input

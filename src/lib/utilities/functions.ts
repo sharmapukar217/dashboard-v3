@@ -9,3 +9,8 @@ export function pick<T, Key extends keyof T>(data: T, keys: Key[]): Pick<T, Key>
   for (const key of keys) newData[key] = data[key];
   return newData;
 }
+
+export function ensureRole(currentRole: string, requiredRoles: string[]) {
+  const roles = ["developer"].concat(requiredRoles);
+  return roles.includes(currentRole);
+}

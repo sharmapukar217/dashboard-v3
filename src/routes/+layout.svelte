@@ -26,7 +26,6 @@
   $: if ($flash) toast.show($flash);
 
   $: $navigating ? nProgress.start() : nProgress.done();
-
   $: if ($navigating?.from && $navigating.from?.url.toString() != $navigating.to?.url.toString()) {
     if ($navigating.from.url.pathname !== "/login") {
       previousUrl.set($navigating.from.url.toString());

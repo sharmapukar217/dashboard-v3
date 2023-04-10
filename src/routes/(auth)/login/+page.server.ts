@@ -59,7 +59,7 @@ export const actions = {
     setFlash(
       {
         id: "auth",
-        type: "success",
+        type: "info",
         message: `You're now logged in as ${user.name}.`
       },
       event

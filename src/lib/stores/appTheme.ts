@@ -12,7 +12,7 @@ function createStore() {
   const { update, subscribe } = writable<AppTheme>({
     mode: "light",
     primary: "blue",
-    navTheme: "dark",
+    navTheme: "dark"
   });
 
   function changeMode(mode?: AppTheme["mode"]) {

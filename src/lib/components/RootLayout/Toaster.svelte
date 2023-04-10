@@ -46,7 +46,7 @@
 </script>
 
 <div
-  class="absolute bottom-0 inset-x-0 w-full z-100 flex flex-col-reverse px-2 select-none pointer-events-none">
+  class="fixed bottom-0 inset-x-0 w-full z-100 flex flex-col-reverse px-2 select-none pointer-events-none">
   {#each $toasts as t (t.id)}
     <div
       use:swipe
