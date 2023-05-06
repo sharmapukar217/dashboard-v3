@@ -5,11 +5,14 @@
   import { updateFlash } from "sveltekit-flash-message/client";
   import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 
-  import { authStore } from "$lib/stores/authStore"
+  import { pageMeta } from "$lib/stores/pageMeta";
+  import { authStore } from "$lib/stores/authStore";
   import { previousUrl } from "$lib/stores/previousUrl";
   import { onLoadSavedAccounts } from "$lib/functions/auth.telefunc";
 
   export let data;
+
+  pageMeta.set({ title: "Switch account" });
 
   const query = createQuery({
     refetchOnMount: true,
@@ -84,22 +87,23 @@
           <div class="ml-2 text-left">
             <div class="block">{account.name}</div>
             <div class="inline-flex items-center block text-xs">
-              <span class="text-primary-500 hover:underline cursor-pointer">@{account.username}</span>
+              <span class="text-primary-500 hover:underline cursor-pointer"
+                >@{account.username}</span>
               {#if account.id === $authStore.currentUser?.id}
-              <div class="ml-1 text-gray-500">(current)</div>
+                <div class="ml-1 text-gray-500">(current)</div>
               {/if}
             </div>
           </div>
 
           <div class="ml-auto inline-flex space-x-1">
             {#if account.id !== $authStore.currentUser?.id}
-            <button
-              type="submit"
-              formaction="?/login&username={account.username}&userId={account.id}"
-              title="login as @{account.username}"
-              class="my-auto text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-green-400 p-1 inline-flex justify-center">
-              <i class="i-heroicons-chevron-right w-6 h-6" />
-            </button>
+              <button
+                type="submit"
+                formaction="?/login&username={account.username}&userId={account.id}"
+                title="login as @{account.username}"
+                class="my-auto text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:ring-2 focus:ring-green-400 p-1 inline-flex justify-center">
+                <i class="i-heroicons-chevron-right w-6 h-6" />
+              </button>
             {/if}
 
             <button
@@ -117,7 +121,7 @@
     {/if}
   </form>
   <a
-    href="/login"
+    href="/login?saveLogin=true"
     class="bg-gray-100 border-2 border-white dark:border-gray-800 shadow dark:bg-gray-700 dark:text-white text-primary-600 rounded-lg !mt-1 p-2 text-base text-center inline-flex items-center justify-center space-x-2">
     <i class="i-bi-person-plus w-5 h-5" />
     <span>Add account</span>

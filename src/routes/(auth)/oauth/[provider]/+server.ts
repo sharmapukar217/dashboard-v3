@@ -5,7 +5,6 @@ import { OAuthService, type Provider } from "$lib/utilities/oauth.server";
 import { prisma } from "$lib/utilities/prisma.server";
 import { getCurrentUser } from "$lib/functions/auth.server";
 
-
 export const GET = async function (event) {
   const url = new URL(event.request.url);
   const provider = event.params.provider as Provider;
@@ -45,17 +44,16 @@ export const GET = async function (event) {
       where: { AND: [{ provider }, { userId: currentUser.id }] }
     });
 
-    if(isLinked) {
-     throw redirect(
+    if (isLinked) {
+      throw redirect(
         referer,
         { id: "auth", type: "info", message: `This account is already linked to ${provider}.` },
         event
-      ); 
+      );
     }
-
   }
 
   await event.cookies.set("action", action, { path: "/oauth" });
   await event.cookies.set("referer", referer, { path: "/oauth" });
-  throw redirect(301, oauth.getAuthorizeUrl())
+  throw redirect(301, oauth.getAuthorizeUrl());
 } satisfies RequestHandler;

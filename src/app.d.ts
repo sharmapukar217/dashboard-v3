@@ -30,6 +30,10 @@ declare global {
       onswipeend: (event: CustomEvent) => void;
     }
   }
+
+  interface Window {
+    __PREVENT_AUTH_TOAST__?: boolean;
+  }
 }
 
 declare module "telefunc" {

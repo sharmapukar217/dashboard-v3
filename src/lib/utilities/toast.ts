@@ -17,7 +17,7 @@ export type Toast = {
   createdAt: number;
   id: number | string;
   dismissable: boolean;
-  type: "success" | "error" | "warning" | "info" | "loading";
+  type: "success" | "error" | "warning" | "info" | "loading" | "custom";
 } & ToastContent<SvelteComponent>;
 
 export const timeouts = new Map<Toast["id"], ReturnType<typeof setTimeout>>();

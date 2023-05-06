@@ -1,6 +1,14 @@
 import { getCurrentUser } from "$lib/functions/auth.server";
 import { loadFlash, redirect } from "sveltekit-flash-message/server";
 
+const getTheme = (cookieString = "{}") => {
+  try {
+    return JSON.parse(cookieString);
+  } catch {
+    return {};
+  }
+};
+
 export async function load(event) {
   const flash = loadFlash(event).flash;
   const currentUser = await getCurrentUser(event.locals.sid);
@@ -10,5 +18,5 @@ export async function load(event) {
     throw redirect("/login", { id: "auth", type: "error", message }, event);
   }
 
-  return { flash, currentUser };
+  return { flash, currentUser, theme: getTheme(event.cookies.get("theme")) };
 }

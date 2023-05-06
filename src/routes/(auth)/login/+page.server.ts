@@ -14,6 +14,8 @@ export const actions = {
     const form = await superValidate(event, loginSchema);
     const shouldRedirect = !event.request.headers.get("x-sveltekit-action");
 
+    if (!form.valid) return fail(400, { form });
+
     const user = await prisma.user.findFirst({
       where: {
         OR: [{ username: form.data.login }, { email: form.data.login }]
@@ -47,11 +49,12 @@ export const actions = {
 
     await prisma.session.upsert({
       where: { sid: event.locals.sid },
-      update: { currentUserId: user.id, savedAccounts },
+      update: { currentUserId: user.id, savedAccounts, ipAddress: event.getClientAddress() },
       create: {
         savedAccounts,
         sid: event.locals.sid,
         currentUserId: user.id,
+        ipAddress: event.getClientAddress(),
         userAgent: event.request.headers.get("user-agent")
       }
     });

@@ -13,7 +13,6 @@ export const GET: RequestHandler = async function (event) {
   const referer = event.cookies.get("referer") ?? "/login";
   const redirect_uri = `${PUBLIC_HOST_NAME}/oauth/${provider}/callback`;
 
-  
   // disable caching request
   event.setHeaders({ "cache-control": "no-cache" });
 
@@ -70,30 +69,32 @@ export const GET: RequestHandler = async function (event) {
       );
     }
 
-
     const isAlreadyUsed = await prisma.account.count({
-      where: { providerAccountId: providerUser.id }
+      where: { providerAccountId: String(providerUser.id) }
     });
 
     if (isAlreadyUsed) {
       throw redirect(
         referer,
-        { id: "auth", type: "warning", message: `This account is already linked to another account.` },
+        {
+          id: "auth",
+          type: "warning",
+          message: `This account is already linked to another account.`
+        },
         event
       );
     }
-
 
     const isLinked = await prisma.account.count({
       where: { AND: [{ provider }, { userId: user.id }] }
     });
 
-    if(isLinked) {
-     throw redirect(
+    if (isLinked) {
+      throw redirect(
         referer,
         { id: "auth", type: "info", message: `This account is already linked to ${provider}.` },
         event
-      ); 
+      );
     }
 
     await prisma.account.create({

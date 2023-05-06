@@ -46,7 +46,7 @@
 </script>
 
 <div
-  class="fixed bottom-0 inset-x-0 w-full z-100 flex flex-col-reverse px-2 select-none pointer-events-none">
+  class="fixed bottom-1 inset-x-0 w-full z-100 flex flex-col-reverse px-2 select-none pointer-events-none">
   {#each $toasts as t (t.id)}
     <div
       use:swipe
@@ -58,7 +58,7 @@
       on:touchstart={() => handleToastPause(t)}
       on:mouseleave={() => handleToastResume(t)}
       on:touchend={() => handleToastResume(t)}>
-      {#if t.type}
+      {#if t.type !== "custom"}
         <i
           class={clsx("w-5 h-5 mr-2.5", {
             "i-svg-spinners:ring-resize": t.type === "loading",

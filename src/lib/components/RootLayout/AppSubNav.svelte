@@ -13,7 +13,7 @@
   const handleLogout = async () => {
     if (!confirm("Do you really want to logout from your account?")) return;
 
-    const response = await fetch("/logout", {
+    const response = await fetch("/logout?/logout", {
       method: "POST",
       body: new FormData()
     });
@@ -21,7 +21,8 @@
     await updateFlash(page);
     const result = deserialize(await response.text());
 
-    if (result.type !== "redirect") {
+    if (result.type === "redirect") {
+      window.__PREVENT_AUTH_TOAST__ = true;
       await queryClient.setQueryData(["current-user"], null);
       await queryClient.invalidateQueries();
       dispatch("close");
@@ -41,8 +42,7 @@
 </button>
 
 <a
-  href="/settings/account"
-  on:click={() => dispatch("close")}
+  href="/settings"
   class="hover:bg-primary-600 flex w-full items-center rounded-lg px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
   <i class="i-bi-gear-wide-connected mr-3 text-xl" />
   <span>Account &amp; Settings</span>

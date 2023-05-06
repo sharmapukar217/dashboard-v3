@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
   import { appTheme, type AppTheme } from "$lib/stores/appTheme";
 
-  export const theme: Partial<AppTheme> | undefined = {};
-  if (theme) appTheme.update((t) => ({ ...t, ...theme }));
+  export let initialTheme: Partial<AppTheme> | undefined = {};
+  if (initialTheme) appTheme.update((t) => ({ ...t, ...initialTheme }));
 
   let mode = $appTheme.mode;
   const media = "(prefers-color-scheme: dark)";
@@ -39,6 +39,6 @@
   {@html themeScript}
 </svelte:head>
 
-<div id="app-theme" class={mode} style:color-scheme={mode}>
+<div id="app-theme" class={mode} style:color-scheme={mode} data-palette={$appTheme.palette}>
   <slot />
 </div>

@@ -6,7 +6,11 @@
   import { useQueryClient } from "@tanstack/svelte-query";
   import * as flashModule from "sveltekit-flash-message/client";
 
-  import { loginSchema } from "$lib//utilities/zod-schema";
+  import { pageMeta } from "$lib/stores/pageMeta";
+  import { previousUrl } from "$lib/stores/previousUrl";
+  import { loginSchema } from "$lib/utilities/zod-schema";
+
+  pageMeta.set({ title: "Welcome to login" });
 
   const queryClient = useQueryClient();
 
@@ -20,7 +24,7 @@
     onResult({ result }) {
       if (result.type === "success" && result.data?.currentUser) {
         queryClient.setQueryData(["current-user"], result.data.currentUser);
-        goto("/");
+        goto($previousUrl);
       } else {
         applyAction(result);
       }
@@ -35,19 +39,24 @@
       isPassword = !isPassword;
     }
   };
+
+  if ($page.url.searchParams.get("saveLogin") === "true") {
+    $form.saveLogin = true;
+  }
 </script>
 
 <form method="post" action="?/credentials" class="h-full" autocomplete="off" use:enhance>
   <div class="mt-2">
     <label for="login" class="text-gray-800 dark:text-gray-200">Username or email address</label>
     <input
+      required
       type="text"
       id="login"
       name="login"
       bind:value={$form.login}
       data-invalid={$errors.login}
       placeholder="Enter your email address or username."
-      class="block w-full text-sm rounded-xl border-2 border-white shadow outline-none focus:border-primary-500 focus:ring-0 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-300 py-2.5" />
+      class="block w-full text-sm rounded-xl border-2 border-white shadow outline-none focus:border-primary-500 focus:ring-0 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-primary-500 dark:placeholder-gray-300 py-2.5" />
     {#if $errors.login}
       <small class="text-red-500">{$errors.login}</small>
     {/if}
@@ -56,6 +65,7 @@
   <div class="mt-2 relative">
     <label for="password" class="text-gray-800 dark:text-gray-200">Password</label>
     <input
+      required
       id="password"
       type="password"
       name="password"
@@ -63,7 +73,7 @@
       bind:value={$form.password}
       data-invalid={$errors.password}
       placeholder="Enter your password."
-      class="block w-full text-sm rounded-xl border-2 border-white shadow outline-none focus:border-primary-500 focus:ring-0 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-300 pr-8 py-2.5" />
+      class="block w-full text-sm rounded-xl border-2 border-white shadow outline-none focus:border-primary-500 focus:ring-0 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-primary-500 dark:placeholder-gray-300 pr-8 py-2.5" />
     <button type="button" class="absolute right-2 top-8" on:click={togglePassword}>
       <i class="{isPassword ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'} w-6 h-6" />
     </button>
@@ -83,9 +93,7 @@
       <label for="saveLogin" class="ml-1.6 text-gray-800 dark:text-gray-200">Save login info</label>
     </div>
 
-    <a
-      href="/reset-password"
-      class="ml-auto text-primary-500 dark:text-primary-400 hover:underline">
+    <a href="/reset-pwd" class="ml-auto text-primary-500 dark:text-primary-400 hover:underline">
       Forgot password?
     </a>
   </div>

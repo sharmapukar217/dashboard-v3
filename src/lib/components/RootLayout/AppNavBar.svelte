@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { clsx } from "clsx";
+  import { page } from "$app/stores";
   import { afterNavigate } from "$app/navigation";
 
   import { navlinks } from "./utils";
@@ -7,12 +9,17 @@
   import { authStore } from "$lib/stores/authStore";
   import { NavLink } from "$lib/components/Navigation";
   import { appTheme } from "$lib/stores/appTheme";
-  import { ensureRole } from "$lib/utilities/functions";
+  import { ensureRoles } from "$lib/utilities/functions";
 
-  // prettier-ignore
-  let navOpened = false, subNavOpened = false;
+  let subNavOpened = false;
+  let navOpened = false;
 
-  const toggleNavBar = () => {
+  if ($page.url.searchParams.get("navbarOpened") === "true") {
+    navOpened = true;
+  }
+
+  const toggleNavBar = (e: any) => {
+    e.preventDefault();
     navOpened = !navOpened;
   };
 
@@ -32,14 +39,20 @@
     navOpened = false;
     subNavOpened = false;
   });
+
+  $page.url.searchParams.set("navbarOpened", !navOpened);
 </script>
 
 <nav
   use:clickAway={closeNav}
-  class="nav-{$appTheme.navTheme} shadow border-white flex select-none flex-wrap items-center border-b border-gray-300 py-1.5 pl-4 pr-2 z-10 md:flex-nowrap dark:(bg-black border-gray-700)"
-  class:bg-white={$appTheme.navTheme === "light"}
-  class:bg-gray-800={$appTheme.navTheme === "dark"}
-  class:disabled={!$authStore.currentUser}>
+  class={clsx(
+    "shadow border-white flex select-none flex-wrap items-center border-b border-gray-300 py-1.5 pl-4 pr-2 z-12 md:flex-nowrap dark:(bg-black border-gray-700)",
+    {
+      "bg-white nav-white": $appTheme.lightNavBar,
+      "bg-gray-800 nav-dark": !$appTheme.lightNavBar,
+      disabled: !$authStore.currentUser
+    }
+  )}>
   <div class="ml-2 mr-8 h-10 w-10">
     <img alt="" src="/app-logo.svg" class="h-10 w-10" />
   </div>
@@ -51,11 +64,12 @@
       <i class="i-heroicons-bell rotate-15 h-6 w-6" />
     </a>
 
-    <button
+    <a
+      href={$page.url.href}
       on:click={toggleNavBar}
       class="inline-flex items-center justify-center rounded-md px-2 py-1 md:hidden hover:bg-gray-100 focus:(outline-none ring-2.2 ring-black) [.nav-dark_&]:(focus:ring-white text-gray-400 hover:bg-gray-700 hover:text-white) dark:(hover:bg-dark-700 focus:ring-white)">
       <i class="w-8 h-8 {navOpened ? 'i-bi-x' : 'i-bi-list'}" />
-    </button>
+    </a>
 
     {#if $authStore.currentUser}
       <div class="relative hidden md:inline-flex" use:clickAway={closeSubNav}>
@@ -65,7 +79,7 @@
           <img alt="" class="hw-full rounded-full" src={$authStore.currentUser.picture} />
         </button>
         <div
-          class="min-w-60 absolute right-0 top-8 p-1 z-20 rounded-lg shadow border bg-white [.nav-dark_&]:(bg-gray-900 border-0) !dark:(bg-black border-dark-700)"
+          class="min-w-60 fixed right-3 top-8 p-1 rounded-lg shadow border bg-white [.nav-dark_&]:(bg-gray-900 border-0) !dark:(bg-black border-dark-700)"
           class:block={subNavOpened}
           class:hidden={!subNavOpened}>
           <AppSubNav on:close={closeSubNav} />
@@ -79,7 +93,7 @@
     class:hidden={!navOpened}
     class="nav-links mt-1 basis-full flex-col space-y-1 md:order-1 md:mt-0 md:flex md:flex-row md:space-x-1 md:space-y-0">
     {#each navlinks as link (link.href)}
-      {#if !$authStore.currentUser || !link.roles || ensureRole($authStore.currentUser?.role, link.roles)}
+      {#if !$authStore.currentUser || !link.roles || ensureRoles($authStore.currentUser?.role, link.roles)}
         <NavLink
           href={link.href}
           exact={link.href === "/"}

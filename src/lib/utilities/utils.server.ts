@@ -16,7 +16,7 @@ export async function rateLimit(
     const remaning = Math.floor((ttl - Date.now()) / 1000) + 1;
 
     if (!message) message = `Too many requests! Try in ${remaning} seconds.`;
-    throw redirect({ id, type: "warning", message }, event);
+    throw redirect({ id, type: "warning", message, dismissable: false }, event);
   } else {
     cache.set(event.locals.sid, count + 1, window);
   }

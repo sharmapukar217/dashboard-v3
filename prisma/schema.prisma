@@ -12,7 +12,7 @@ model Session {
   currentUserId String?
   lastLoggedIn  DateTime?
   userAgent     String?
-  // ipAddress     String
+  ipAddress     String
   savedAccounts String @default("")
 
   currentUser User? @relation(fields: [currentUserId], references: [id])
@@ -21,14 +21,14 @@ model Session {
 }
 
 // TODO: think for the notification subscription model
-model NoficicationSubscription {
-  deviceId     String @id
-  subscription String
-  userId       String
-  user         User   @relation(fields: [userId], references: [id])
-
-  @@map("notification_subscriptions")
+model PushSubscription {
+  id     String @id @default(cuid()) @map("_id")
+  subscription  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@map("push_subscriptions")
 }
+
 
 model Account {
   id                String  @id @default(cuid()) @map("_id")
@@ -49,7 +49,7 @@ model User {
   id       String @id @default(cuid()) @map("_id")
   name     String
   picture  String
-  username String @unique
+  username String?
   email    String @unique
   role     String @default("normaluser")
   password String
@@ -62,12 +62,15 @@ model User {
   accounts          Account[]
   vendor                    Vendor                     @relation(fields: [vendorId], references: [id], onDelete: NoAction)
   Session                   Session[]
-  noficicationSubscriptions NoficicationSubscription[]
+  pushSubscriptions PushSubscription[]
 
   PackagesUpdatedByUser Package[] @relation(name: "StatusUpdatedBy")
   PackagesForPickup     Package[] @relation(name: "PickupPerson")
   PackagesForDelivery   Package[] @relation(name: "DeliveryPerson")
   PackagesForReturn     Package[] @relation(name: "ReturnPerson")
+
+  CustomerPaymentVerifiedBy     Package[] @relation(name: "CustomerPaymentVerifiedBy")
+  VendorPaymentVerifiedBy     Package[] @relation(name: "VendorPaymentVerifiedBy")
 
   @@map("users")
 }
@@ -121,6 +124,17 @@ model Package {
   PickupPerson    User? @relation(name: "PickupPerson", fields: [pickupPerson], references: [id])
   DeliveryPerson  User? @relation(name: "DeliveryPerson", fields: [pickupPerson], references: [id])
   ReturnPerson    User? @relation(name: "ReturnPerson", fields: [pickupPerson], references: [id])
+  CustomerPaymentVerifiedBy User? @relation(name: "CustomerPaymentVerifiedBy", fields: [customerPaymentVerifiedBy], references: [id])
+  VendorPaymentVerifiedBy User? @relation(name: "VendorPaymentVerifiedBy", fields: [customerPaymentVerifiedBy], references: [id])
 
   @@map("packages")
+}
+
+
+model Token {
+  id         String @id @default(cuid()) @map("_id")
+  identifier String
+  tokenType  String
+  token      String
+  @@map("tokens")
 }

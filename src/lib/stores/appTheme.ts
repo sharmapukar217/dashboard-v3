@@ -1,18 +1,22 @@
-import { writable } from "svelte/store";
+import Cookie from "js-cookie";
+import { writable, get } from "svelte/store";
+import { toast } from "$lib/utilities/toast";
 
 export type AppTheme = {
-  primary: "blue" | "purple";
-  navTheme: "light" | "dark";
+  lightNavBar: boolean;
+  palette: "blue" | "purple";
   mode: "light" | "dark" | "system";
 };
+
+export const PALETTES = ["blue", "red", "cyan", "gray", "pink", "purple", "indigo"];
 
 const MODES = ["light", "dark", "system"];
 
 function createStore() {
-  const { update, subscribe } = writable<AppTheme>({
+  const { set, update, subscribe } = writable<AppTheme>({
     mode: "light",
-    primary: "blue",
-    navTheme: "dark"
+    palette: "blue",
+    lightNavBar: false
   });
 
   function changeMode(mode?: AppTheme["mode"]) {
@@ -24,7 +28,13 @@ function createStore() {
     });
   }
 
-  return { update, changeMode, subscribe };
+  function saveTheme() {
+    const theme = JSON.stringify(get({ subscribe }));
+    Cookie.set("theme", theme, { path: "/", expires: 100 });
+    toast.show({ type: "info", id: "theme", message: "Theme preferences saved." });
+  }
+
+  return { set, update, saveTheme, changeMode, subscribe };
 }
 
 export const appTheme = createStore();
