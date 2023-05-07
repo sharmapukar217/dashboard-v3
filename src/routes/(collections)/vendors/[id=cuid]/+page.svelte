@@ -33,7 +33,7 @@
   });
 
   const { form, errors, enhance, submitting, capture, restore } = superForm(data.form, {
-    resetForm: true,
+    resetForm: false,
     invalidateAll: false,
     defaultValidator: "clear",
     validators: updateVendorSchema,

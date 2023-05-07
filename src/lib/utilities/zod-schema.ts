@@ -61,13 +61,14 @@ export const addPackageInfoSchema = z.object({
 export const updatePackageInfoSchema = z.object({});
 
 export const profileSchema = z.object({
-  username: z.string().trim().nullable().optional().default(undefined),
+  username: z.string().trim().nullable().optional().default(undefined).transform(z => z?.toLowerCase()),
   name: z.string().nonempty("Enter the full name of the user.").trim(),
   email: z
     .string()
     .nonempty("Enter the email address of the user.")
     .trim()
     .email("Please enter a valid email address.")
+    .transform(z => z?.toLowerCase())
 });
 
 export const updatePasswordSchema = z
@@ -104,6 +105,7 @@ export const addVendorSchema = z.object({
     .nonempty("Enter the email address of the for vendor.")
     .trim()
     .email("Please enter a valid email address.")
+    .transform(z => z?.toLowerCase())
 });
 
 export const updateVendorSchema = z.object({
@@ -118,7 +120,8 @@ export const updateVendorSchema = z.object({
     .nonempty("Enter the email address of the vendor.")
     .trim()
     .email()
-    .optional(),
+    .optional()
+    .transform(z => z?.toLowerCase()),
   mainVendorName: z
     .string()
     .nonempty("Enter the parent vendor of this vendor.")
@@ -138,12 +141,13 @@ export const updateUserSchema = z
       .nonempty("Enter the vendor of the user.")
       .trim()
       .transform((v) => v.toUpperCase()),
-    username: z.string().trim().nullable().optional().default(undefined),
+    username: z.string().trim().nullable().optional().default(undefined).transform(z => z?.toLowerCase()),
     email: z
       .string()
       .nonempty("Enter the email address of the user.")
       .trim()
-      .email("Please enter a valid email address."),
+      .email("Please enter a valid email address.")
+      .transform(z => z?.toLowerCase()),
     password: z.string().trim().optional().nullable(),
     confirmPassword: z.string().trim().optional().nullable(),
     autoGeneratePassword: z.boolean().default(false)
@@ -181,7 +185,7 @@ export const updateUserSchema = z
 export const addUserSchema = z
   .object({
     role: z.string().trim().default("NORMALUSER"),
-    username: z.string().trim().nullable().optional().default(undefined),
+    username: z.string().trim().nullable().optional().default(undefined).transform(z => z?.toLowerCase()),
     name: z.string().nonempty("Enter the full name of the user.").trim(),
     vendorName: z
       .string()
@@ -192,7 +196,8 @@ export const addUserSchema = z
       .string()
       .nonempty("Enter the email address of the user.")
       .trim()
-      .email("Please enter a valid email address."),
+      .email("Please enter a valid email address.")
+      .transform(z => z?.toLowerCase()),
     password: z.string().trim().optional().nullable(),
     confirmPassword: z.string().trim().optional().nullable(),
     autoGeneratePassword: z.boolean().default(false),
@@ -235,7 +240,7 @@ export const resetPasswordSchema = z
       .string({ required_error: "Please enter your email address." })
       .nonempty("Please enter your email address.")
       .trim()
-      .email(),
+      .email().transform(z => z?.toLowerCase()),
     token: z.string().optional(),
     otp: z
       .preprocess(

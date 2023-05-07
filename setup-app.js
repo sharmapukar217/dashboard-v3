@@ -13,7 +13,7 @@ const userData = {
 	role: "DEVELOPER",
 	name: "Pukar Sharma",
 	username: "sharmapukar217",
-	password: "pukar@sharma_217",
+	password: "12122121",
 	email: "sharmapukar217@gmail.com"
 };
 

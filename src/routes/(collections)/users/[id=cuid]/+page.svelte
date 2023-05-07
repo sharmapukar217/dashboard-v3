@@ -26,7 +26,7 @@
     queryFn: () => onLoadUserById($page.params.id)
   });
 
-  $: if ($user.data) pageMeta.set({ title: `User (@${$user.data.username})` });
+  $: if ($user.data) pageMeta.set({ title: `User (${$user.data.name})` });
 
   const vendorsList = createQuery({
     queryKey: ["vendors-list"],
@@ -34,7 +34,7 @@
   });
 
   const { form, errors, enhance, submitting, capture, restore } = superForm(data.form, {
-    resetForm: true,
+    resetForm: false,
     invalidateAll: false,
     taintedMessage: false,
     defaultValidator: "clear",

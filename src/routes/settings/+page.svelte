@@ -28,7 +28,7 @@
 
   $: if ($authStore.currentUser) {
     pageMeta.set({
-      title: `Accounts & Settings (@${$authStore.currentUser.username})`
+      title: `Accounts & Settings (${$authStore.currentUser.name})`
     });
   }
 
