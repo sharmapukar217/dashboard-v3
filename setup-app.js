@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const vendorData = {
-	vendorName: "LogikinNepal",
+	vendorName: "LOGIKINNEPAL",
 	vendorAddress: "Thapathali",
 	vendorEmail: "sharmapukar217@gmail.com"
 };

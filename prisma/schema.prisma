@@ -10,11 +10,11 @@ datasource db {
 
 model Session {
   sid           String    @id
-  currentUserId String?
-  lastLoggedIn  DateTime?
-  userAgent     String?
-  ipAddress     String
-  savedAccounts String @default("")
+  currentUserId String? @map("current_user_id")
+  lastLoggedIn  DateTime? @map("last_logged_in")
+  userAgent     String? @map("user_agent")
+  ipAddress     String @map("ip_address")
+  savedAccounts String @default("") @map("saved_accounts")
 
   currentUser User? @relation(fields: [currentUserId], references: [id])
 
@@ -25,7 +25,7 @@ model Session {
 model PushSubscription {
   id     String @id @default(cuid()) @map("_id")
   subscription  String @unique
-  userId String
+  userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   @@map("push_subscriptions")
 }
@@ -33,8 +33,8 @@ model PushSubscription {
 
 model Account {
   id                String  @id @default(cuid()) @map("_id")
-  providerAccountId String  @unique
-  userId            String
+  providerAccountId String  @unique @map("provider_account_id")
+  userId            String @map("user_id")
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type              String
   provider          String
@@ -54,11 +54,11 @@ model User {
   email    String @unique
   role     String @default("normaluser")
   password String
-  vendorId String
+  vendorId String @map("vendor_id")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
 
   accounts          Account[]
   vendor                    Vendor                     @relation(fields: [vendorId], references: [id], onDelete: NoAction)
@@ -80,10 +80,10 @@ model User {
 
 model Vendor {
   id            String  @id @default(cuid()) @map("_id")
-  vendorName    String
-  vendorEmail   String
-  vendorAddress String
-  mainVendorId  String?
+  vendorName    String @map("vendor_name")
+  vendorEmail   String @map("vendor_email")
+  vendorAddress String @map("vendor_address")
+  mainVendorId  String? @map("main_vendor_id")
   User          User[]
 
   mainVendor Vendor?   @relation(name: "Vendor_Vendor", fields: [mainVendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -95,33 +95,33 @@ model Vendor {
 
 model Package {
   id              String @id @default(cuid()) @map("_id")
-  customerName    String
-  customerNumber  String
-  customerAddress String
-  vendorId        String
+  customerName    String @map("customer_name")
+  customerNumber  String @map("customer_number")
+  customerAddress String @map("customer_address")
+  vendorId        String @map("vendor_id")
   vendor          Vendor @relation(fields: [vendorId], references: [id])
   status          String @default("ORDER_CREATED")
 
-  statusUpdatedBy String
-  statusUpdatedAt DateTime @default(now())
+  statusUpdatedBy String @map("status_updated_by")
+  statusUpdatedAt DateTime @default(now()) @map("status_updated_at")
 
-  pickupPerson   String?
-  deliveryPerson String?
-  returnPerson   String?
+  pickupPerson   String? @map("pickup_person")
+  deliveryPerson String?  @map("delivery_person")
+  returnPerson   String? @map("return_person")
 
-  customerPaymentMethod     String    @default("NOT_PAID")
-  customerPaymentVerifiedBy String?
-  customerPaymentVerifiedAt DateTime?
-  vendorPaymentMethod       String    @default("NOT_PAID")
-  vendorPaymentVerifiedBy   String?
-  vendorPaymentVerifiedAt   DateTime?
+  customerPaymentMethod     String    @default("NOT_PAID") @map("customer_payment_method")
+  customerPaymentVerifiedBy String? @map("customer_payment_verified_by")
+  customerPaymentVerifiedAt DateTime? @map("customer_payment_verified_at")
+  vendorPaymentMethod       String    @default("NOT_PAID") @map("vendor_payment_method")
+  vendorPaymentVerifiedBy   String? @map("vendor_payment_verified_by")
+  vendorPaymentVerifiedAt   DateTime? @map("vendor_payment_verified_at")
 
   cod            Float
-  deliveryCharge Float @default(100)
+  deliveryCharge Float @default(100) @map("delivery_charge")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
 
   StatusUpdatedBy User  @relation(name: "StatusUpdatedBy", fields: [statusUpdatedBy], references: [id])
   PickupPerson    User? @relation(name: "PickupPerson", fields: [pickupPerson], references: [id])
@@ -137,15 +137,15 @@ model Package {
 model Token {
   id         String @id @default(cuid()) @map("_id")
   identifier String
-  tokenType  String
+  tokenType  String @map("token_type")
   token      String
   @@map("tokens")
 }
 
 model UserReport {
   id         String @id @default(cuid()) @map("_id")
-  userId      String
-  reportType  String
+  userId      String @map("user_id")
+  reportType  String @map("report_type")
   description String
   screenshots String @default("")
 
