@@ -10,6 +10,11 @@
   const queryClient = useQueryClient();
   const dispatch = createEventDispatcher();
 
+  const toggleTheme = () => {
+    appTheme.changeMode()
+    appTheme.saveTheme();
+  }
+
   const handleLogout = async () => {
     if (!confirm("Do you really want to logout from your account?")) return;
 
@@ -33,7 +38,7 @@
 </script>
 
 <button
-  on:click={() => appTheme.changeMode()}
+  on:click={toggleTheme}
   class="hover:bg-primary-600 group relative flex w-full items-center rounded-lg px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
   <i class="i-bi-palette mr-3 text-xl" />
   <span>Toggle Theme</span>
