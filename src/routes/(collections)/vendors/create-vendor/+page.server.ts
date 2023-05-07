@@ -54,10 +54,10 @@ export const actions = {
     });
 
     await mailer.sendMail({
-      to: newVendor.email,
+      to: newVendor.vendorEmail,
       from: process.env.EMAIL_FROM,
-      subject: `New vendor ${newVendor.name} registered`,
-      html: `<span>A vendor <b>${newVendor.name}</b> was registered successfully using this email address. You might soon receive your credentials or an account setup email.</span>`
+      subject: `New vendor ${newVendor.vendorName} registered`,
+      html: `<span>A vendor <b>${newVendor.vendorName}</b> was registered successfully using this email address. You might soon receive your credentials or an account setup email.</span>`
     });
 
     setFlash(
