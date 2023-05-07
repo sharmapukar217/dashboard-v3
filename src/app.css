@@ -188,9 +188,21 @@
 }
 
 .autocomplete-list-item.selected {
-  --at-apply: "!bg-primary-300 ";
+  --at-apply: "!bg-primary-300";
 }
 
 .autocomplete-list-item.confirmed {
   --at-apply: "!bg-primary-500 ";
 }
+
+select{
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        text-overflow:'' !important;
+        text-indent: 0.01px !important; /* Removes default arrow from firefox*/
+        text-overflow: "" !important;  /*Removes default arrow from firefox*/
+    }
+    select::-ms-expand {
+        display: none;
+    }

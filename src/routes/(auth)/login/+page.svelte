@@ -7,7 +7,6 @@
   import * as flashModule from "sveltekit-flash-message/client";
 
   import { pageMeta } from "$lib/stores/pageMeta";
-  import { previousUrl } from "$lib/stores/previousUrl";
   import { loginSchema } from "$lib/utilities/zod-schema";
 
   pageMeta.set({ title: "Welcome to login" });
@@ -21,10 +20,11 @@
     validators: loginSchema,
     defaultValidator: "clear",
     flashMessage: { module: flashModule },
-    onResult({ result }) {
+    async onResult({ result }) {
       if (result.type === "success" && result.data?.currentUser) {
         queryClient.setQueryData(["current-user"], result.data.currentUser);
-        goto($previousUrl);
+        await queryClient.invalidateQueries();
+        goto("/");
       } else {
         applyAction(result);
       }

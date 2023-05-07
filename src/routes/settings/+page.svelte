@@ -154,7 +154,8 @@
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelUploadProfile = () => {
+    if(inputEl) inputEl.reset()
     imgRef.src = _imgSrc;
     isUploaded = false;
   };
@@ -166,6 +167,12 @@
       goto(ev.target.href);
     }
   };
+
+  const handleCancelBugReport = (ev: any) => {
+    if (confirm(`Do you really want to cancel reporting?`)) {
+      // todo cancel report form
+    }
+  }
 </script>
 
 <WithAuth>
@@ -226,7 +233,7 @@
 
                   <button
                     type="button"
-                    on:click={handleCancel}
+                    on:click={handleCancelUploadProfile}
                     class="py-2 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                     Cancel
                   </button>
@@ -308,7 +315,8 @@
               </div>
             </div>
           </li>
-          <li class="py-4">
+          <!-- WIP: Not implemented twitter -->
+          <li class="py-4 hidden">
             <div class="flex items-center space-x-4">
               <div class="flex-shrink-0">
                 <i class="i-bi-twitter h-6 w-6 text-[#1da1f2]" />
@@ -438,7 +446,7 @@
               required />
             {#if $vendorErrors.vendorEmail}
               <small class="text-red-500">{$vendorErrors.vendorEmail}</small>
-            <br>
+              <br />
             {/if}
             <small class="text-gray-500 text-xs"
               >This email is used for emails, notifications and alerts.</small>
@@ -475,6 +483,62 @@
           </div>
         </form>
       </div>
+
+      <!-- report bugs -->
+      <details
+        class="p-4 mt-4 bg-white border border-gray-200 rounded-xl shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <summary class="text-xl font-semibold dark:text-white cursor-pointer"
+          >Bugs & Reports</summary>
+        <div class="text-xs text-gray-500 dark:text-gray-300">
+          Report for the bugs or provide feedbacks.
+        </div>
+
+        <form method="post" action="?/report" autocomplete="off" class="space-y-3 pt-4">
+          <div class="w-full sm:w-2/3">
+            <label
+              for="reporterUsername"
+              class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+            <input
+              type="text"
+              id="reporterUsername"
+              name="reporterUsername"
+              value={$authStore.currentUser?.username}
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Enter your username"
+              disabled
+              readonly />
+            {#if $profileErrors.username}
+              <small class="text-red-500">{$profileErrors.username}</small>
+            {/if}
+          </div>
+
+          <div class="w-full sm:w-3/4">
+            <label
+              for="reportType"
+              class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Type</label>
+            <select
+              id="reportType"
+              name="reportType"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+              <option disabled selected>Please select an option.</option>
+              <option value="report">Report a bug</option>
+              <option value="feedback">Provide feedback</option>
+              <option value="featueRequest">Request for feature</option>
+            </select>
+          </div>
+
+          <div class="w-full">
+            <label for="description" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+            <textarea id="description" name="description" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
+          </div>
+
+          <div class="w-full">
+            <label for="screenshots" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Screenshots</label>
+            <input type="file" name="screenshots" id="screenshots" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" multiple>
+          </div>
+
+        </form>
+      </details>
     </div>
 
     <!-- right side -->
@@ -539,9 +603,9 @@
                 aria-invalid={!!$profileErrors.username}
                 class="shadow-sm bg-gray-50 block border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Please enter your username address" />
-            {#if $profileErrors.username}
-              <small class="text-red-500 block">{$profileErrors.username}</small>
-            {/if}
+              {#if $profileErrors.username}
+                <small class="text-red-500 block">{$profileErrors.username}</small>
+              {/if}
             </div>
           </div>
 

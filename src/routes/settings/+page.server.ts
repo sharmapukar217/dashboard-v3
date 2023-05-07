@@ -86,7 +86,7 @@ export const actions = {
       }
     }
 
-    if(!!profileForm.data.username?.trim()) {
+    if (!!profileForm.data.username?.trim()) {
       if (profileForm.data.username !== user.username) {
         const usernameExists = await prisma.user.count({
           where: {
@@ -100,7 +100,7 @@ export const actions = {
         }
       }
     } else {
-      profileForm.data.username = undefined
+      profileForm.data.username = undefined;
     }
 
     const updatedProfile = await prisma.user.update({
@@ -162,7 +162,7 @@ export const actions = {
 
     if (!!vendorForm.data.vendorName && vendorForm.data.vendorName !== vendor.vendorName) {
       const nameExists = await prisma.vendor.count({
-        where:{ vendorName: vendorForm.data.vendorName }
+        where: { vendorName: vendorForm.data.vendorName }
       });
 
       if (nameExists) {

@@ -53,7 +53,7 @@ export const actions = {
         return fail(400, { form });
       }
     } else {
-      form.data.username = undefined
+      form.data.username = undefined;
     }
 
     const {

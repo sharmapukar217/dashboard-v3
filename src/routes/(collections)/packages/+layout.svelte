@@ -1,13 +1,14 @@
 <script lang="ts">
   import { writable } from "svelte/store";
-  import TableView from "./TableView.svelte";
   import BreadCrumbs from "./BreadCrumbs.svelte";
   import { createInfiniteQuery } from "@tanstack/svelte-query";
   import { createTable, createRender } from "svelte-headless-table";
   import { addSelectedRows, addHiddenColumns } from "svelte-headless-table/plugins";
 
-  import IDRow from "./IDRow.svelte";
+  import IDColumn from "./IDColumn.svelte";
   import StatusColumn from "./StatusColumn.svelte";
+  import PaymentsColumn from "./PaymentsColumn.svelte";
+
   import { authStore } from "$lib/stores/authStore";
   import { ensureRoles } from "$lib/utilities/functions";
   import Renderer from "$lib/components/Renderer.svelte";
@@ -67,7 +68,7 @@
         header: "ID",
         cell: (info) => {
           const { id, createdAt } = info.row.original;
-          return createRender(IDRow, { id, createdAt });
+          return createRender(IDColumn, { id, createdAt });
         }
       }),
       table.column({
@@ -122,21 +123,10 @@
           header: "Customer Payment",
           accessor: "customerPaymentMethod",
           cell: (info) => {
-            const { customerPaymentMethod, customerPaymentVerifiedBy, customerPaymentVerifiedAt } =
-              info.row.original;
-            const date = new Date(customerPaymentVerifiedAt).toLocaleString();
-            const badgeType = customerPaymentMethod === "NOT_PAID" ? "badge-red" : "badge-green";
-            const title = customerPaymentVerifiedBy
-              ? `verified by @${customerPaymentVerifiedBy} at ${date}`
-              : "not paid.";
-            return createRender(Renderer, {
-              component: `<div><span class="badge ${badgeType}" title="${title}">${customerPaymentMethod}</span>
-          ${
-            customerPaymentVerifiedBy
-              ? `<div><small class="text-primary-500 hover:underline">@${customerPaymentVerifiedBy}</small> <br /><small class="text-gray-500">${date}</small></div>`
-              : ""
-          }
-          </div>`
+            return createRender(PaymentsColumn, {
+              method: info.row.original.customerPaymentMethod,
+              verifiedAt: info.row.original.customerPaymentVerifiedAt,
+              verifiedBy: info.row.original.CustomerPaymentVerifiedBy?.username
             });
           }
         }),
@@ -144,19 +134,10 @@
         header: "Vendor Payment",
         accessor: "vendorPaymentMethod",
         cell: (info) => {
-          const { vendorPaymentMethod, vendorPaymentVerifiedBy, vendorPaymentVerifiedAt } =
-            info.row.original;
-          const badgeType = vendorPaymentMethod === "NOT_PAID" ? "badge-red" : "badge-green";
-          return createRender(Renderer, {
-            component: `<div><span class="badge ${badgeType}">${vendorPaymentMethod}</span>
-          ${
-            vendorPaymentVerifiedBy
-              ? `<div><small class="text-primary-500 hover:underline">@${vendorPaymentVerifiedBy}</small> <br /><small class="text-gray-500">${new Date(
-                  vendorPaymentVerifiedAt
-                ).toLocaleString()}</small></div>`
-              : ""
-          }
-          </div>`
+          return createRender(PaymentsColumn, {
+            method: info.row.original.vendorPaymentMethod,
+            verifiedAt: info.row.original.vendorPaymentVerifiedAt,
+            verifiedBy: info.row.original.VendorPaymentVerifiedBy?.username
           });
         }
       }),

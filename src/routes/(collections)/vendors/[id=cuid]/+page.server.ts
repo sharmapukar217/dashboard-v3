@@ -42,8 +42,7 @@ export const actions = {
     const form = await superValidate(event.request, updateVendorSchema);
     const shouldRedirect = !event.request.headers.get("x-sveltekit-action");
 
-  if (!form.valid) return fail(400, { form });
-    
+    if (!form.valid) return fail(400, { form });
 
     let mainVendorId: string | undefined = undefined;
 

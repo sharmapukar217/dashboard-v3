@@ -39,7 +39,6 @@
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnMount: false,
         refetchOnWindowFocus: false,
         enabled: !import.meta.env.SSR,
         cacheTime: 1000 * 60 * 60 * 24
@@ -81,7 +80,7 @@
   <AppNavBar />
   <div class="relative flex flex-col h-full overflow-y-auto">
     {#key data.route}
-      <div class="hw-full flex flex-col overflow-x-hidden" in:fade>
+      <div class="hw-full flex flex-col overflow-x-hidden" id="page" in:fade>
         <slot />
       </div>
     {/key}

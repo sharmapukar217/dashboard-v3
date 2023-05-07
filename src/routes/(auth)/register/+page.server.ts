@@ -1,4 +1,4 @@
-import { hash } from "argon2"
+import { hash } from "argon2";
 import { error, fail } from "@sveltejs/kit";
 import { createVerifier } from "fast-jwt";
 import { pick } from "$lib/utilities/functions";
@@ -36,10 +36,17 @@ export const actions = {
     const form = await superValidate(event.request, addUserSchema);
     if (!form.valid) return fail(400, { form });
 
-	const token = event.url.searchParams.get("token");
-	if(!token) {
-    	throw redirect({ id: "auth", type: "error", message: "An error occured while trying to setup your account." }, event);
-	}
+    const token = event.url.searchParams.get("token");
+    if (!token) {
+      throw redirect(
+        {
+          id: "auth",
+          type: "error",
+          message: "An error occured while trying to setup your account."
+        },
+        event
+      );
+    }
 
     const savedToken = await prisma.token.findFirst({
       where: {
@@ -47,8 +54,15 @@ export const actions = {
       }
     });
 
-    if(!savedToken) {
-    	throw redirect({ id: "auth", type: "error", message: "An error occured while trying to setup your account." }, event);
+    if (!savedToken) {
+      throw redirect(
+        {
+          id: "auth",
+          type: "error",
+          message: "An error occured while trying to setup your account."
+        },
+        event
+      );
     }
 
     const emailExists = await prisma.user.count({
@@ -70,38 +84,49 @@ export const actions = {
         return fail(400, { form });
       }
     } else {
-      form.data.username=undefined
+      form.data.username = undefined;
     }
 
     const vendor = await prisma.vendor.findFirst({
-    	select: { id: true },
-    	where: { vendorName: form.data.vendorName }
+      select: { id: true },
+      where: { vendorName: form.data.vendorName }
     });
 
-    if(!vendor) {
-    	throw redirect({ id: "auth", type: "error", message: "An error occured while trying to setup your account." }, event);
+    if (!vendor) {
+      throw redirect(
+        {
+          id: "auth",
+          type: "error",
+          message: "An error occured while trying to setup your account."
+        },
+        event
+      );
     }
 
-  const picture = encodeURI(`https://ui-avatars.com/api/?name=${form.data.name}`);
+    const picture = encodeURI(`https://ui-avatars.com/api/?name=${form.data.name}`);
 
-  	console.log(pick(form.data, ["name", "email", "username", "role", "password"]))
+    console.log(pick(form.data, ["name", "email", "username", "role", "password"]));
     await prisma.user.create({
-    	data: {
-    		...pick(form.data, ["name", "email", "username", "role", "password"]),
-    		password: await hash(form.data.password),
-    		vendorId: vendor.id,
-    		picture
-    	}
+      data: {
+        ...pick(form.data, ["name", "email", "username", "role", "password"]),
+        password: await hash(form.data.password),
+        vendorId: vendor.id,
+        picture
+      }
     });
 
     await prisma.token.delete({
-    	where: { id: savedToken.id }
+      where: { id: savedToken.id }
     });
 
-    throw redirect("/login", {
-    	id: "auth",
-    	type: "success",
-    	message: "Your account was created successfully. You can now login to your account."
-    }, event);
+    throw redirect(
+      "/login",
+      {
+        id: "auth",
+        type: "success",
+        message: "Your account was created successfully. You can now login to your account."
+      },
+      event
+    );
   }
 };

@@ -45,17 +45,19 @@ export const addPackageInfoSchema = z.object({
     .string({ required_error: "Please provide the vendor name." })
     .trim()
     .nonempty("Please provide the vendor name.")
-    .transform(v => v.toUpperCase())
+    .transform((v) => v.toUpperCase())
 });
+
+export const updatePackageInfoSchema = z.object({});
 
 export const profileSchema = z.object({
   username: z.string().trim().nullable().optional().default(undefined),
-    name: z.string().nonempty("Enter the full name of the user.").trim(),
-    email: z
-      .string()
-      .nonempty("Enter the email address of the user.")
-      .trim()
-      .email("Please enter a valid email address."),
+  name: z.string().nonempty("Enter the full name of the user.").trim(),
+  email: z
+    .string()
+    .nonempty("Enter the email address of the user.")
+    .trim()
+    .email("Please enter a valid email address.")
 });
 
 export const updatePasswordSchema = z
@@ -80,7 +82,11 @@ export const updatePasswordSchema = z
   });
 
 export const addVendorSchema = z.object({
-  vendorName: z.string().nonempty("Enter the name of the vendor.").trim().transform(v => v.toUpperCase()),
+  vendorName: z
+    .string()
+    .nonempty("Enter the name of the vendor.")
+    .trim()
+    .transform((v) => v.toUpperCase()),
   vendorAddress: z.string().nonempty("Enter the location of the vendor.").trim(),
   mainVendorName: z.string().nonempty("Enter the parent vendor of this vendor.").trim().optional(),
   vendorEmail: z
@@ -91,7 +97,11 @@ export const addVendorSchema = z.object({
 });
 
 export const updateVendorSchema = z.object({
-  vendorName: z.string().nonempty("Enter the name of the vendor.").trim().transform(v =>v.toUpperCase()),
+  vendorName: z
+    .string()
+    .nonempty("Enter the name of the vendor.")
+    .trim()
+    .transform((v) => v.toUpperCase()),
   vendorAddress: z.string().nonempty("Enter the location of vendor.").trim().optional(),
   vendorEmail: z
     .string()
@@ -106,14 +116,18 @@ export const updateVendorSchema = z.object({
     .optional()
     .nullable()
     .default(undefined)
-    .transform(v => v?v.toUpperCase():v)
+    .transform((v) => (v ? v.toUpperCase() : v))
 });
 
 export const updateUserSchema = z
   .object({
     role: z.string().trim().default("NORMALUSER"),
     name: z.string().nonempty("Enter the full name of the user.").trim(),
-    vendorName: z.string().nonempty("Enter the vendor of the user.").trim().transform(v => v.toUpperCase()),
+    vendorName: z
+      .string()
+      .nonempty("Enter the vendor of the user.")
+      .trim()
+      .transform((v) => v.toUpperCase()),
     username: z.string().trim().nullable().optional().default(undefined),
     email: z
       .string()
@@ -159,7 +173,11 @@ export const addUserSchema = z
     role: z.string().trim().default("NORMALUSER"),
     username: z.string().trim().nullable().optional().default(undefined),
     name: z.string().nonempty("Enter the full name of the user.").trim(),
-    vendorName: z.string().nonempty("Enter the vendor of the user.").trim().transform(v=>v.toUpperCase()),
+    vendorName: z
+      .string()
+      .nonempty("Enter the vendor of the user.")
+      .trim()
+      .transform((v) => v.toUpperCase()),
     email: z
       .string()
       .nonempty("Enter the email address of the user.")
@@ -175,30 +193,30 @@ export const addUserSchema = z
 
     if (data.password && data.password.trim() === "") {
       ctx.addIssue({
-          path: ["password"],
-          code: z.ZodIssueCode.custom,
-          message: "Please enter a new password."
-        });
-    }else if (data.password?.length < 6) {
-        ctx.addIssue({
-          path: ["password"],
-          code: z.ZodIssueCode.custom,
-          message: "Password must be atleast six characters long."
-        });
-      }
-      if (!!data.password && !data.confirmPassword) {
-        ctx.addIssue({
-          path: ["confirmPassword"],
-          code: z.ZodIssueCode.custom,
-          message: "Please confirm the new password."
-        });
-      } else if (data.password !== data.confirmPassword) {
-        ctx.addIssue({
-          path: ["confirmPassword"],
-          code: z.ZodIssueCode.custom,
-          message: "The two passwords don't match."
-        });
-      }
+        path: ["password"],
+        code: z.ZodIssueCode.custom,
+        message: "Please enter a new password."
+      });
+    } else if (data.password?.length < 6) {
+      ctx.addIssue({
+        path: ["password"],
+        code: z.ZodIssueCode.custom,
+        message: "Password must be atleast six characters long."
+      });
+    }
+    if (!!data.password && !data.confirmPassword) {
+      ctx.addIssue({
+        path: ["confirmPassword"],
+        code: z.ZodIssueCode.custom,
+        message: "Please confirm the new password."
+      });
+    } else if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        path: ["confirmPassword"],
+        code: z.ZodIssueCode.custom,
+        message: "The two passwords don't match."
+      });
+    }
   });
 
 export const resetPasswordSchema = z

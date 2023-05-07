@@ -15,9 +15,55 @@ export async function getPackages(user: any) {
       },
       StatusUpdatedBy: {
         select: { username: true }
+      },
+      PickupPerson: {
+        select: { username: true }
+      },
+      DeliveryPerson: {
+        select: { username: true }
+      },
+      ReturnPerson: {
+        select: { username: true }
+      },
+      CustomerPaymentVerifiedBy: {
+        select: { username: true }
+      },
+      VendorPaymentVerifiedBy: {
+        select: { username: true }
       }
     }
   });
 
   return packages;
+}
+
+export async function getPackageById(currentUser: any, packageId?: string) {
+  if (!currentUser || !packageId) return null;
+
+  return await prisma.package.findFirst({
+    where: { id: packageId },
+    include: {
+      vendor: {
+        select: { vendorName: true }
+      },
+      StatusUpdatedBy: {
+        select: { username: true }
+      },
+      PickupPerson: {
+        select: { username: true }
+      },
+      DeliveryPerson: {
+        select: { username: true }
+      },
+      ReturnPerson: {
+        select: { username: true }
+      },
+      CustomerPaymentVerifiedBy: {
+        select: { username: true }
+      },
+      VendorPaymentVerifiedBy: {
+        select: { username: true }
+      }
+    }
+  });
 }

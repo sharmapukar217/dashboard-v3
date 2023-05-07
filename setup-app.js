@@ -10,7 +10,7 @@ const vendorData = {
 };
 
 const userData = {
-	role: "developer",
+	role: "DEVELOPER",
 	name: "Pukar Sharma",
 	username: "sharmapukar217",
 	password: "pukar@sharma_217",

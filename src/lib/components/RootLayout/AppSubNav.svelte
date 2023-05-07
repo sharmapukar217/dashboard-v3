@@ -24,7 +24,7 @@
     if (result.type === "redirect") {
       window.__PREVENT_AUTH_TOAST__ = true;
       await queryClient.setQueryData(["current-user"], null);
-      await queryClient.invalidateQueries();
+      queryClient.invalidateQueries();
       dispatch("close");
     } else {
       applyAction(result);

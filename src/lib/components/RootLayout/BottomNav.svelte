@@ -1,13 +1,18 @@
 <script lang="ts">
   import { navlinks } from "./utils";
+  import { swipe } from "$lib/actions/swipe";
   import { authStore } from "$lib/stores/authStore";
   import { NavLink } from "$lib/components/Navigation";
   import { ensureRoles } from "$lib/utilities/functions";
+
+  const handleSwipe = (ev: any) => {};
 </script>
 
 {#if !!$authStore.currentUser}
   <div
+    use:swipe
     id="bottom-nav"
+    on:swiping={handleSwipe}
     class="inline-flex md:hidden bg-white border-t pt-1.5 w-full children:w-full dark:(bg-black border-gray-700)">
     {#each navlinks as link (link.href)}
       {#if !link.roles || ensureRoles($authStore.currentUser?.role, link.roles)}

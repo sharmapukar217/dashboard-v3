@@ -7,7 +7,6 @@
 
   import { pageMeta } from "$lib/stores/pageMeta";
   import { authStore } from "$lib/stores/authStore";
-  import { previousUrl } from "$lib/stores/previousUrl";
   import { onLoadSavedAccounts } from "$lib/functions/auth.telefunc";
 
   export let data;
@@ -58,8 +57,7 @@
         if (result.data?.currentUser) {
           queryClient.setQueryData(["current-user"], result.data.currentUser);
           await queryClient.invalidateQueries();
-
-          await goto($previousUrl.startsWith("/login") ? "/" : $previousUrl);
+          await goto("/");
         } else if (result.data?.removed) {
           queryClient.setQueryData(["saved-accounts"], (data: any) => {
             return data.filter((d: any) => d.username !== username);
@@ -117,7 +115,9 @@
         </div>
       {/each}
     {:else}
-      <div class="bg-white rounded-lg py-1.5 px-2 text-base text-center">No saved accounts.</div>
+      <div class="bg-white dark:bg-gray-700 rounded-lg py-1.5 px-2 text-base text-center">
+        No saved accounts.
+      </div>
     {/if}
   </form>
   <a

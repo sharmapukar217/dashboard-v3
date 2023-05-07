@@ -1,4 +1,3 @@
-import { hash } from "argon2";
 import { fail } from "@sveltejs/kit";
 import { redirect, setFlash } from "sveltekit-flash-message/server";
 import { setError, superValidate } from "sveltekit-superforms/server";
@@ -6,44 +5,54 @@ import { setError, superValidate } from "sveltekit-superforms/server";
 import { mailer } from "$lib/utilities/mailer";
 import { omit } from "$lib/utilities/functions";
 import { prisma } from "$lib/utilities/prisma.server";
-import { rateLimit } from "$lib/utilities/utils.server";
 import { getCurrentUser } from "$lib/functions/auth.server";
-import { generatePassword } from "$lib/utilities/functions";
-import { addUserSchema } from "$lib/utilities/zod-schema";
-import { getUserById } from "$lib/functions/user.server";
+import { updatePackageInfoSchema } from "$lib/utilities/zod-schema";
+import { getPackageById } from "$lib/functions/package.server";
 
 export async function load(event) {
-  await event.parent();
-  const form = await superValidate(addUserSchema);
+  const { currentUser } = await event.parent();
+  const form = await superValidate(updatePackageInfoSchema);
 
-  const user = await getUserById(event.params.id);
-
-  if (!user) {
+  if (!currentUser) {
     throw redirect(
-      "/users",
+      "/login",
       {
-        id: "users",
+        id: "auth",
         type: "error",
         dismissable: false,
-        message: "User's details not found or was deleted!"
+        message: "Please login to your account to continue."
+      },
+      event
+    );
+  }
+
+  const packageInfo = await getPackageById(currentUser, event.params.id);
+
+  if (!packageInfo) {
+    throw redirect(
+      "/packages",
+      {
+        type: "error",
+        id: "packageInfo",
+        dismissable: false,
+        message: "Package details not found or was deleted!"
       },
       event
     );
   }
 
   form.data = {
-    ...omit(user, ["vendor"]),
-    vendorName: user.vendor.vendorName
+    ...omit(packageInfo, ["vendor"]),
+    vendorName: packageInfo.vendor.vendorName
   };
 
-  return { form, user };
+  return { form, packageInfo };
 }
 
 export const actions = {
   async default(event) {
-    await rateLimit(event, { max: 5, window: 5 });
     const currentUser = await getCurrentUser(event.locals.sid);
-    const form = await superValidate(event.request, addUserSchema);
+    const form = await superValidate(event.request, updatePackageInfoSchema);
 
     if (!form.valid) return fail(400, { form });
 
