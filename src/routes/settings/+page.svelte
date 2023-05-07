@@ -2,12 +2,13 @@
   import { clsx } from "clsx";
   import { page } from "$app/stores";
   import UAParser from "ua-parser-js";
-  import { goto } from "$app/navigation";
   import { deserialize } from "$app/forms";
+  import { goto, invalidateAll } from "$app/navigation";
   import { superForm } from "sveltekit-superforms/client";
   import * as flashModule from "sveltekit-flash-message/client";
   import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 
+  import { toast } from "$lib/utilities/toast";
   import { pageMeta } from "$lib/stores/pageMeta";
   import { authStore } from "$lib/stores/authStore";
   import { ensureRoles } from "$lib/utilities/functions";
@@ -17,9 +18,10 @@
   import { onLoadUserSessions, onLoadConnectedAccounts } from "$lib/functions/auth.telefunc";
 
   import {
+    reportSchema,
     profileSchema,
     updateVendorSchema,
-    updatePasswordSchema
+    updatePasswordSchema,
   } from "$lib/utilities/zod-schema";
 
   export let data;
@@ -107,6 +109,24 @@
     }
   });
 
+  const {
+    form: reportForm,
+    errors: reportErrors,
+    enhance: reportFormEnhance,
+    submitting: reportSubmitting,
+    reset: reportFormReset,
+    tainted: reportFormTainted,
+  } = superForm($page.form?.reportForm, {
+    id: "update-password-form",
+    resetForm: true,
+    invalidateAll: false,
+    taintedMessage: false,
+    defaultValidator: "clear",
+    validators: reportSchema,
+    flashMessage: { module: flashModule },
+  });
+
+
   const handleRevokeAll = async (ev: any) => {
     ev.preventDefault();
     if (!confirm("Do you really want to logout your account from all the device?")) {
@@ -169,8 +189,46 @@
   };
 
   const handleCancelBugReport = (ev: any) => {
-    if (confirm(`Do you really want to cancel reporting?`)) {
+    if(!$reportFormTainted?.description && !$reportFormTainted?.screenshots) return;
+    if (!!$reportFormTainted && confirm(`Do you really want to cancel reporting?`)) {
       // todo cancel report form
+      reportFormReset();
+    }
+  }
+
+  const handleSwitchAccount = async (ev: any) => {
+    const id = ev.target.value;
+    const username = ev.target.querySelector(`option[value=${id}]`)?.innerHTML
+    if(username && confirm(`Sure to switch account to ${username}?`)) {
+
+      try {
+      toast.show({
+        id: "auth",
+        type: "loading",
+        message: "Switching account..."
+      });
+      const response = await fetch(`/login/saved-accounts?/login&userId=${id}`, {
+        method: "post",
+        body: new FormData(),
+        headers: { "x-sveltekit-action": true }
+      });
+      const result = deserialize(await response.text());
+
+      if(result.type === "success" && result.data.currentUser) {
+        await invalidateAll();
+        await flashModule.updateFlash(page);
+        await queryClient.invalidateQueries();
+        ev.target.value = $authStore.currentUser.id;
+      }
+      } catch {
+        toast.show({
+          id: "auth",
+          type: "error",
+          message: "Couldn't switch to this account at this moment."
+        })
+      }
+    } else {
+      ev.target.value = $authStore.currentUser.id
     }
   }
 </script>
@@ -199,21 +257,30 @@
       </h1>
     </div>
     <!-- left side content -->
-    <div class="col-span-full xl:col-auto">
+    <div class="col-span-full xl:col-auto relative">
       <!-- profile picture -->
       <div
         class="p-4 mb-4 bg-white border border-gray-200 rounded-xl shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <select class="absolute w-99% left-0.5 right-0.5 top-0.5 rounded-t-xl bg-white dark:bg-gray-800 !border-0 !ring-0 text-gray-900 text-sm w-full py-1 px-4 sm:px-6 dark:placeholder-gray-400 dark:text-white pt-1.5 font-medium" on:change={handleSwitchAccount}>
+            <option disabled selected class="!block !text-gray-400" value={$authStore.currentUser?.id}>@{$authStore.currentUser?.username}</option>
+            {#each data.savedAccounts as savedAccount (savedAccount.id)}
+              {#if savedAccount.id !== $authStore.currentUser?.id}
+              <option value={savedAccount.id}>@{savedAccount.username}</option>
+              {/if}
+            {/each}
+        </select>
         <div class="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
           <img
             alt=""
             bind:this={imgRef}
             src={$authStore.currentUser?.picture}
-            class="mb-4 rounded-xl w-28 h-28 sm:mb-0 xl:mb-4 2xl:mb-0" />
+            class="mt-4 sm:mt-2 mb-4 rounded-xl w-28 h-28 sm:mb-0 xl:mb-4 2xl:mb-0" />
+            <small class="text-gray-500 dark:text-gray-300 text-xs">File upload is currently work in progress...</small>
           <div>
             <h3 class="mb-1 text-xl font-bold text-gray-900 dark:text-white">Profile picture</h3>
-            <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+            <!-- <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
               JPG, GIF or PNG. Max size of 800K
-            </div>
+            </div> -->
             <div class="flex items-center space-x-4">
               <form class="inline-flex items-center space-x-2">
                 <input
@@ -486,14 +553,15 @@
 
       <!-- report bugs -->
       <details
-        class="p-4 mt-4 bg-white border border-gray-200 rounded-xl shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        class="p-4 mt-4 bg-white border border-gray-200 rounded-xl shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:px-6 dark:bg-gray-800">
         <summary class="text-xl font-semibold dark:text-white cursor-pointer"
           >Bugs & Reports</summary>
         <div class="text-xs text-gray-500 dark:text-gray-300">
           Report for the bugs or provide feedbacks.
         </div>
 
-        <form method="post" action="?/report" autocomplete="off" class="space-y-3 pt-4">
+        <form method="post" action="?/report" autocomplete="off" class="space-y-3 pt-4" use:reportFormEnhance>
+
           <div class="w-full sm:w-2/3">
             <label
               for="reporterUsername"
@@ -507,34 +575,69 @@
               placeholder="Enter your username"
               disabled
               readonly />
-            {#if $profileErrors.username}
-              <small class="text-red-500">{$profileErrors.username}</small>
-            {/if}
           </div>
 
           <div class="w-full sm:w-3/4">
             <label
               for="reportType"
               class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Type</label>
-            <select
+            <select 
+              required
               id="reportType"
               name="reportType"
+              bind:value={$reportForm.reportType}
+              aria-invalid={!!$reportErrors.reportType}
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-              <option disabled selected>Please select an option.</option>
+              <option disabled class="!block">Please select an option.</option>
               <option value="report">Report a bug</option>
               <option value="feedback">Provide feedback</option>
               <option value="featueRequest">Request for feature</option>
             </select>
+            {#if $reportErrors.reportType}
+              <small class="text-red-500">{$reportErrors.reportType}</small>
+            {/if}
           </div>
 
           <div class="w-full">
             <label for="description" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-            <textarea id="description" name="description" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
+            <textarea bind:value={$reportForm.description} aria-invalid={!!$reportErrors.description} required id="description" name="description" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
+
+             {#if $reportErrors.description}
+              <small class="text-red-500">{$reportErrors.description}</small>
+            {/if}
           </div>
 
           <div class="w-full">
             <label for="screenshots" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Screenshots</label>
-            <input type="file" name="screenshots" id="screenshots" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" multiple>
+            <input type="file" name="screenshots" id="screenshots" accept="image/*" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" multiple>
+          </div>
+
+          <small class="text-xs text-gray-500 dark:text-gray-300">Currently uploading screenshots is a work in progress.</small>
+
+
+           <div class="w-full inline-flex items-center space-x-2">
+            <button
+              class="w-full text-white !bg-primary-700 !hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-xl text-sm px-5 py-2.5 text-center !dark:bg-primary-600 !dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              type="submit"
+              disabled={$reportSubmitting}>
+              {#if $reportSubmitting}
+                <i class="i-svg-spinners:3-dots-scale w-6 h-6 mr-2" />
+              {:else}
+                Submit
+              {/if}
+            </button>
+
+
+            <button
+              type="button"
+              class="w-full px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-xl hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+              on:click={handleCancelBugReport}>
+              {#if $reportSubmitting}
+                <i class="i-svg-spinners:3-dots-scale w-6 h-6 mr-2" />
+              {:else}
+                Cancel
+              {/if}
+            </button>
           </div>
 
         </form>

@@ -3,16 +3,17 @@ import { verify, hash } from "argon2";
 import { setFlash, redirect } from "sveltekit-flash-message/server";
 import { setError, superValidate } from "sveltekit-superforms/server";
 
-import { omit } from "$lib/utilities/functions";
+import { omit, pick } from "$lib/utilities/functions";
 import { prisma } from "$lib/utilities/prisma.server";
 import { rateLimit } from "$lib/utilities/utils.server";
 import {
+  getSavedAccounts,
   getUserSessions,
   getCurrentUser,
   formatUserData,
   getConnectedAccounts
 } from "$lib/functions/auth.server";
-import { profileSchema, updateVendorSchema, updatePasswordSchema } from "$lib/utilities/zod-schema";
+import { reportSchema, profileSchema, updateVendorSchema, updatePasswordSchema } from "$lib/utilities/zod-schema";
 
 export async function load({ parent, locals }) {
   const { currentUser } = await parent();
@@ -43,11 +44,53 @@ export async function load({ parent, locals }) {
 
   const userSessions = await getUserSessions(currentUser?.id, locals.sid);
   const connectedAccounts = await getConnectedAccounts(currentUser?.id);
+  const savedAccounts = await getSavedAccounts(locals.sid)
 
-  return { profileForm, vendorForm, userSessions, connectedAccounts };
+  return { profileForm, vendorForm, userSessions, connectedAccounts, savedAccounts };
 }
 
 export const actions = {
+
+  async report(event) {
+    await rateLimit(event, { max: 5, window: 5 });
+
+    const shouldRedirect = !event.request.headers.get("x-sveltekit-action");
+    const reportForm = await superValidate(event.request, reportSchema, {
+      id: "report-form"
+    });
+
+    if (!reportForm.valid) return fail(400, { reportForm });
+
+    const user = await getCurrentUser(event.locals.sid);
+
+    if (!user) {
+      throw redirect(
+        "/login",
+        {
+          id: "auth",
+          type: "error",
+          message: "Please login to your account to continue.",
+          dismissable: false
+        },
+        event
+      );
+    }
+
+    // add report
+    await prisma.userReport.create({
+      data: pick(reportForm.data, ["userId", "reportType", "description"])
+    });
+
+    setFlash({
+      id: "report",
+      type: "success",
+      message: "Your report was submitted to the admins."
+    }, event);
+
+    if (shouldRedirect) throw redirect(301, "/settings");
+    else return { reportForm };
+  },
+
   async updateProfile(event) {
     await rateLimit(event, { max: 5, window: 5 });
 

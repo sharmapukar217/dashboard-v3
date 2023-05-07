@@ -9,6 +9,16 @@ export const phoneNumberSchema = z
   .trim()
   .regex(PHONE_NUMBER_REGEX, "Please enter a valid phone number.");
 
+export const reportSchema = z.object({
+  reportType: z
+    .string({ required_error: "Please select one of the reporting type." })
+    .nonempty("Please select one of the reporting type."),
+  description: z
+    .string({ required_error: "Please provide the description." })
+    .nonempty("Please provide the description."),
+  screenshots: z.any()
+})
+
 export const loginSchema = z.object({
   saveLogin: z.any().transform((v) => !!v),
   login: z

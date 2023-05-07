@@ -28,10 +28,12 @@ function createStore() {
     });
   }
 
-  function saveTheme() {
+  function saveTheme(noPrompt = false) {
     const theme = JSON.stringify(get({ subscribe }));
     Cookie.set("theme", theme, { path: "/", expires: 100 });
-    toast.show({ type: "info", id: "theme", message: "Theme preferences saved." });
+    if(!noPrompt) {
+      toast.show({ type: "info", id: "theme", message: "Theme preferences saved." });
+    }
   }
 
   return { set, update, saveTheme, changeMode, subscribe };

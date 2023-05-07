@@ -133,7 +133,9 @@
 @layer utilities {
 
 
-  input[aria-invalid="true"] {
+  input[aria-invalid="true"],
+  textarea[aria-invalid="true"],
+  select[aria-invalid="true"] {
     --at-apply: "!bg-red-100 !text-red-500 !border-red-500 !focus:ring-1.5 !ring-red-300 !placeholder-red-500 !dark:bg-red-200";
   }
 

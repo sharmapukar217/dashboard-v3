@@ -59,14 +59,7 @@ export const actions = {
       }
     });
 
-    setFlash(
-      {
-        id: "auth",
-        type: "info",
-        message: `You're now logged in as ${user.name}.`
-      },
-      event
-    );
+    setFlash({ type: "info", id: "auth", message: `You're now logged in as ${user.name}${user.username?` (@${user.username})`:""}.` }, event);
 
     if (shouldRedirect) {
       throw redirect(301, "/");

@@ -18,9 +18,12 @@ export const actions = {
     if (userId) {
       const exists = await prisma.session.count({
         where: {
-          AND: [
+          OR: [
             {
               savedAccounts: { contains: userId }
+            },
+            {
+              currentUserId: userId
             }
           ]
         }
@@ -31,6 +34,7 @@ export const actions = {
           where: { id: userId }
         });
 
+
         if (user) {
           await prisma.session.update({
             where: { sid: event.locals.sid },
@@ -38,7 +42,9 @@ export const actions = {
               currentUserId: user.id
             }
           });
-          setFlash({ type: "info", id: "auth", message: `Welcome ${user.name}.` }, event);
+
+
+          setFlash({ type: "info", id: "auth", message: `Welcome ${user.name}${user.username?` (@${user.username})`:""}.` }, event);
 
           if (shouldRedirect) {
             throw redirect(301, "/");

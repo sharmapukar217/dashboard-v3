@@ -79,7 +79,7 @@
           <img alt="" class="hw-full rounded-full" src={$authStore.currentUser.picture} />
         </button>
         <div
-          class="min-w-60 fixed right-3 top-8 p-1 rounded-lg shadow border bg-white [.nav-dark_&]:(bg-gray-900 border-0) !dark:(bg-black border-dark-700)"
+          class="min-w-60 fixed right-3 top-8 p-1 rounded-xl shadow border bg-white [.nav-dark_&]:(bg-gray-900 border-0) !dark:(bg-black border-dark-700)"
           class:block={subNavOpened}
           class:hidden={!subNavOpened}>
           <AppSubNav on:close={closeSubNav} />
@@ -98,7 +98,7 @@
           href={link.href}
           exact={link.href === "/"}
           activeclass="!bg-gray-200 !text-black ![.nav-dark_&]:(bg-gray-900 text-white) !dark:(bg-dark-700 text-white) !dark:[.nav-dark_&]:(bg-dark-700 text-white)"
-          class="block rounded-md px-3 py-1.5 text-base font-medium text-gray-800 hover:(bg-gray-100 text-black) [.nav-dark_&]:(text-gray-200 hover:text-white hover:bg-gray-700) dark:(text-gray-300 hover:text-white hover:bg-dark-900)">
+          class="block rounded-lg px-3 py-1.5 text-base font-medium text-gray-800 hover:(bg-gray-100 text-black) [.nav-dark_&]:(text-gray-200 hover:text-white hover:bg-gray-700) dark:(text-gray-300 hover:text-white hover:bg-dark-900)">
           <i class="{link.icon} mr-3 h-5 w-5 md:hidden" />
           <span>{link.title}</span>
         </NavLink>

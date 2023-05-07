@@ -12,7 +12,7 @@
 
   const toggleTheme = () => {
     appTheme.changeMode()
-    appTheme.saveTheme();
+    appTheme.saveTheme(true);
   }
 
   const handleLogout = async () => {
@@ -39,7 +39,7 @@
 
 <button
   on:click={toggleTheme}
-  class="hover:bg-primary-600 group relative flex w-full items-center rounded-lg px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
+  class="hover:bg-primary-600 group relative flex w-full items-center rounded-xl px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
   <i class="i-bi-palette mr-3 text-xl" />
   <span>Toggle Theme</span>
   <small class="ml-auto text-[8px] uppercase text-gray-500 group-hover:text-white"
@@ -48,14 +48,14 @@
 
 <a
   href="/settings"
-  class="hover:bg-primary-600 flex w-full items-center rounded-lg px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
+  class="hover:bg-primary-600 flex w-full items-center rounded-xl px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
   <i class="i-bi-gear-wide-connected mr-3 text-xl" />
   <span>Account &amp; Settings</span>
 </a>
 
 <a
   href="/login/saved-accounts"
-  class="hover:bg-primary-600 flex w-full items-center rounded-lg px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
+  class="hover:bg-primary-600 flex w-full items-center rounded-xl px-3 py-2 font-medium dark:text-gray-300 [.nav-dark_&]:text-gray-300 !hover:text-white">
   <i class="i-bi-arrow-repeat mr-3 text-xl" />
   <span>Switch Account</span>
 </a>
@@ -63,7 +63,7 @@
 <form method="post" action="/logout" on:submit|preventDefault={handleLogout}>
   <button
     type="submit"
-    class="flex w-full items-center rounded-lg px-3 py-2 text-base font-medium dark:text-gray-300 hover:bg-red-500 [.nav-dark_&]:text-gray-300 !hover:text-white">
+    class="flex w-full items-center rounded-xl px-3 py-2 text-base font-medium dark:text-gray-300 hover:bg-red-500 [.nav-dark_&]:text-gray-300 !hover:text-white">
     <i class="i-bi-box-arrow-left mr-3 text-xl" />
     <span>Logout</span>
   </button>
