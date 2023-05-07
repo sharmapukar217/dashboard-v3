@@ -68,7 +68,7 @@ export async function getSavedAccounts(sid?: string) {
       const ids = result.savedAccounts.split(",");
       return await prisma.user.findMany({
         where: { id: { in: ids } },
-        select: { id: true, name: true, username: true, picture: true }
+        select: { id: true, name: true, email: true, username: true, picture: true }
       });
     }
   }

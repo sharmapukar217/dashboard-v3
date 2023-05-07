@@ -270,10 +270,24 @@
       <div
         class="p-4 mb-4 bg-white border border-gray-200 rounded-xl shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
         <select class="absolute w-99% left-0.5 right-0.5 top-0.5 rounded-t-xl bg-white dark:bg-gray-800 !border-0 !ring-0 text-gray-900 text-sm w-full py-1 px-4 sm:px-6 dark:placeholder-gray-400 dark:text-white pt-1.5 font-medium" on:change={handleSwitchAccount}>
-            <option disabled selected class="!block !text-gray-400" value={$authStore.currentUser?.id}>@{$authStore.currentUser?.username}</option>
+            <option disabled selected class="!block !text-gray-400" value={$authStore.currentUser?.id}>
+              {$authStore.currentUser?.name} -
+              {#if $authStore.currentUser?.username}
+                @{$authStore.currentUser.username}
+                {:else}
+                {$authStore.currentUser?.email}
+              {/if}
+            </option>
             {#each data.savedAccounts as savedAccount (savedAccount.id)}
               {#if savedAccount.id !== $authStore.currentUser?.id}
-              <option value={savedAccount.id}>@{savedAccount.username}</option>
+              <option value={savedAccount.id}>
+                {savedAccount.name} - 
+                {#if savedAccount.username}
+                  @{savedAccount.username}
+                {:else}
+                  {savedAccount.email}
+                {/if}
+              </option>
               {/if}
             {/each}
         </select>

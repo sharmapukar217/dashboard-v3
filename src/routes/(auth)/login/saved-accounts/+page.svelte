@@ -85,8 +85,13 @@
           <div class="ml-2 text-left">
             <div class="block">{account.name}</div>
             <div class="inline-flex items-center block text-xs">
-              <span class="text-primary-500 hover:underline cursor-pointer"
-                >@{account.username}</span>
+              <span class="text-primary-500 hover:underline cursor-pointer">
+                {#if account.username}
+              @{account.username}
+              {:else}
+              {account.email}
+              {/if}
+              </span>
               {#if account.id === $authStore.currentUser?.id}
                 <div class="ml-1 text-gray-500">(current)</div>
               {/if}
