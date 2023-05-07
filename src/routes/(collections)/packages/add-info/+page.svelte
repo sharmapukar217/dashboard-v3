@@ -21,7 +21,7 @@
   const queryClient = useQueryClient();
   const vendorsList = createQuery({
     queryKey: ["vendors-list"],
-    queryFn: () => onLoadVendors([])
+    queryFn: () => onLoadVendors()
   });
 
   const { form, errors, enhance, submitting, capture, restore } = superForm($page.form, {

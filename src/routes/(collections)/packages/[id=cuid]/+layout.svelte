@@ -16,12 +16,12 @@
         class="w-full rounded-xl py-3 text-center font-medium"
         activeclass="text-primary-500 dark:text-primary-400 bg-gray-100 dark:bg-gray-800 border dark:border-2 dark:border-gray-600"
         >Package Info</NavLink>
-      <NavLink
+     <!--  <NavLink
         exact
         href="/packages/{$page.params.id}/activities"
         class="w-full rounded-xl py-3 text-center font-medium"
         activeclass="text-primary-500 dark:text-primary-400 bg-gray-100 dark:bg-gray-800 border dark:border-2 dark:border-gray-600"
-        >Activities</NavLink>
+        >Activities</NavLink> -->
     </div>
 
     <slot />

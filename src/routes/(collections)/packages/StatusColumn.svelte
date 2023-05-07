@@ -35,7 +35,7 @@
         {assignedFor} assigned to:
         <div class="text-primary-500">@{assignedTo}</div>
       </div>
-    {:else if data}{/if}
+    {/if}
   </div>
 </details>
 {#if assignedTo}

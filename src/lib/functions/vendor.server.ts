@@ -32,6 +32,7 @@ export async function getVendors(userId?: string) {
     },
     where: { id: user.vendorId }
   });
+  
   vendors.set(userVendor.id, userVendor);
 
   return Array.from(vendors, ([_keys, values]) => values);

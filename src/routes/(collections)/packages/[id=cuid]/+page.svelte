@@ -19,7 +19,7 @@
 
   const vendorsList = createQuery({
     queryKey: ["vendors-list"],
-    queryFn: () => onLoadVendors([])
+    queryFn: () => onLoadVendors()
   });
 
   const { form, errors, enhance, submitting, capture, restore } = superForm($page.form, {
@@ -57,18 +57,16 @@
   <div class="relative w-full sm:w-3/4">
     <label for="id" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">ID</label>
     <input
-      type="text"
       id="id"
       name="id"
+      type="text"
       bind:value={$form.id}
       aria-invalid={!!$errors.id}
       class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
       placeholder="Enter the name of the customer"
-      required
       readonly
       disabled
       title="Created at {new Date($packageQuery.data?.createdAt).toLocaleString()}" />
-
     <button class="absolute right-2 top-8" on:click={() => $packageQuery.refetch()}
       ><i
         class="i-bi-arrow-repeat w-6 h-6"

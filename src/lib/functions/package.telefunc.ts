@@ -7,7 +7,7 @@ export async function onLoadPackages() {
   return await getPackages(currentUser);
 }
 
-export async function onLoadPackageById(packageId: string) {
+export async function onLoadPackageById(packageId?: string) {
   const currentUser = await getCurrentUser(getContext().sid);
   return await getPackageById(currentUser, packageId);
 }

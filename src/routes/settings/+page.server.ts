@@ -78,7 +78,10 @@ export const actions = {
 
     // add report
     await prisma.userReport.create({
-      data: pick(reportForm.data, ["userId", "reportType", "description"])
+      data: {
+        ...pick(reportForm.data, ["userId", "reportType", "description", "screenshots"]),
+        userId: user.id
+      }
     });
 
     setFlash({

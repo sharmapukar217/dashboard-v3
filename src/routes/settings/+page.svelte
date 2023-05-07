@@ -116,7 +116,7 @@
     submitting: reportSubmitting,
     reset: reportFormReset,
     tainted: reportFormTainted,
-  } = superForm($page.form?.reportForm, {
+  } = superForm($page.data?.reportForm, {
     id: "update-password-form",
     resetForm: true,
     invalidateAll: false,
@@ -124,6 +124,14 @@
     defaultValidator: "clear",
     validators: reportSchema,
     flashMessage: { module: flashModule },
+    onResult({ result }) {
+      if(result.type === "success") {
+        $reportFormTainted = null;
+        $reportForm.reportType = null;
+        $reportForm.description = null;
+        $reportForm.screenshots = null;
+      }
+    }
   });
 
 
