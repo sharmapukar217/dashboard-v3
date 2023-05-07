@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -122,10 +122,10 @@ model Package {
 
   StatusUpdatedBy User  @relation(name: "StatusUpdatedBy", fields: [statusUpdatedBy], references: [id])
   PickupPerson    User? @relation(name: "PickupPerson", fields: [pickupPerson], references: [id])
-  DeliveryPerson  User? @relation(name: "DeliveryPerson", fields: [pickupPerson], references: [id])
-  ReturnPerson    User? @relation(name: "ReturnPerson", fields: [pickupPerson], references: [id])
+  DeliveryPerson  User? @relation(name: "DeliveryPerson", fields: [deliveryPerson], references: [id])
+  ReturnPerson    User? @relation(name: "ReturnPerson", fields: [returnPerson], references: [id])
   CustomerPaymentVerifiedBy User? @relation(name: "CustomerPaymentVerifiedBy", fields: [customerPaymentVerifiedBy], references: [id])
-  VendorPaymentVerifiedBy User? @relation(name: "VendorPaymentVerifiedBy", fields: [customerPaymentVerifiedBy], references: [id])
+  VendorPaymentVerifiedBy User? @relation(name: "VendorPaymentVerifiedBy", fields: [vendorPaymentVerifiedBy], references: [id])
 
   @@map("packages")
 }
