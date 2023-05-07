@@ -7,10 +7,10 @@
   "private": true,
   "scripts": {
     "dev": "dotenv vite dev",
-    "build": "dotenv vite build",
     "preview": "dotenv vite preview",
     "start": "dotenv node build/index.js",
     "typecheck": "svelte-kit sync && svelte-check",
+    "build": "prisma generate && dotenv vite build",
     "lint": "eslint --fix src/**/*.{ts,svelte} --ignore-path .gitignore",
     "format": "prettier -w src/**/*.{ts,svelte} --ignore-path .gitignore"
   },
